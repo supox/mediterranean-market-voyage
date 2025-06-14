@@ -1,6 +1,12 @@
 
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Sun, CloudRain } from "lucide-react";
 
 interface DayStartModalProps {
@@ -10,7 +16,10 @@ interface DayStartModalProps {
   onClose?: () => void;
 }
 
-const weatherInfo: Record<string, { label: string; icon: React.ReactNode; desc: string }> = {
+const weatherInfo: Record<
+  string,
+  { label: string; icon: React.ReactNode; desc: string }
+> = {
   Sunny: {
     label: "Sunny Skies",
     icon: <Sun size={40} className="text-yellow-400" />,
@@ -28,7 +37,12 @@ const weatherInfo: Record<string, { label: string; icon: React.ReactNode; desc: 
   },
 };
 
-const DayStartModal: React.FC<DayStartModalProps> = ({ open, weather, day, onClose }) => {
+const DayStartModal: React.FC<DayStartModalProps> = ({
+  open,
+  weather,
+  day,
+  onClose,
+}) => {
   const info = weatherInfo[weather] || {
     label: weather,
     icon: null,
@@ -37,7 +51,14 @@ const DayStartModal: React.FC<DayStartModalProps> = ({ open, weather, day, onClo
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-xs flex flex-col items-center animate-fade-in">
+      <DialogContent className="max-w-xs flex flex-col items-center animate-fade-in pt-4">
+        {/* New: Show the uploaded image at the top */}
+        <img
+          src="/lovable-uploads/d7086654-ee76-4b8e-8f73-989a18c0eff3.png"
+          alt="Merchant starting a new day"
+          className="rounded-lg w-[180px] h-[120px] object-cover mb-2 shadow-md"
+          draggable={false}
+        />
         <DialogHeader>
           <DialogTitle className="flex flex-col items-center">
             <span className="text-2xl mb-1">Day {day}</span>
@@ -62,3 +83,4 @@ const DayStartModal: React.FC<DayStartModalProps> = ({ open, weather, day, onClo
 };
 
 export default DayStartModal;
+
