@@ -79,7 +79,7 @@ const Index = () => {
           </>
         )}
       </div>
-      <PricesTable />
+      <PricesTable prices={prices} country={country} />
       <MarketModal
         open={marketOpen}
         onClose={() => setMarketOpen(false)}
