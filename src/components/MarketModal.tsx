@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,13 +35,21 @@ const countryImages: { [key: string]: string } = {
   // Add more here as you upload for other countries
 };
 
-const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance, cargo, prices, country }) => {
+const MarketModal: React.FC<MarketModalProps> = ({
+  open,
+  onClose,
+  onTrade,
+  balance,
+  cargo,
+  prices,
+  country,
+}) => {
   const [type, setType] = useState("Wheat");
   const [quantity, setQuantity] = useState(0);
   const [isBuy, setIsBuy] = useState(true);
 
   const price = prices[type as keyof typeof prices];
-  const cargoAmount = cargo.find(g => g.type === type)?.amount || 0;
+  const cargoAmount = cargo.find((g) => g.type === type)?.amount || 0;
   const maxAffordable = isBuy
     ? Math.floor(balance / price)
     : cargoAmount;
@@ -51,6 +60,16 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
       setQuantity(0);
       onClose();
     }
+  }
+
+  function handleBuyAll() {
+    setIsBuy(true);
+    setQuantity(maxAffordable);
+  }
+
+  function handleSellAll() {
+    setIsBuy(false);
+    setQuantity(maxAffordable);
   }
 
   const marketImage = countryImages[country];
@@ -80,43 +99,71 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
           )}
         </div>
         <div className="flex gap-3 items-center mt-1 mb-2">
-          {GOODS.map(g => (
+          {GOODS.map((g) => (
             <button
               key={g.type}
               onClick={() => setType(g.type)}
-              className={`p-2 rounded-xl text-xl transition bg-white border ${type === g.type ? "border-blue-500 shadow" : "border-slate-100"} hover:bg-blue-50`}
+              className={`p-2 rounded-xl text-xl transition bg-white border ${
+                type === g.type ? "border-blue-500 shadow" : "border-slate-100"
+              } hover:bg-blue-50`}
             >
-              <span role="img" aria-label={g.type}>{g.icon}</span>
+              <span role="img" aria-label={g.type}>
+                {g.icon}
+              </span>
               <span className="ml-2 text-base">{g.type}</span>
             </button>
           ))}
         </div>
         <div className="flex items-center gap-5 mb-2">
           <Label>Price:</Label>
-          <span className="font-semibold">{price.toLocaleString()} ₪ / ton</span>
+          <span className="font-semibold">
+            {price.toLocaleString()} ₪ / ton
+          </span>
         </div>
         <div className="flex gap-3 mb-3">
           <button
             onClick={() => setIsBuy(true)}
-            className={`px-4 py-1 rounded-md border ${isBuy ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200"}`}
-          >Buy</button>
+            className={`px-4 py-1 rounded-md border ${
+              isBuy
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-slate-50 border-slate-200"
+            }`}
+          >
+            Buy
+          </button>
           <button
             onClick={() => setIsBuy(false)}
-            className={`px-4 py-1 rounded-md border ${!isBuy ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200"}`}
-          >Sell</button>
+            className={`px-4 py-1 rounded-md border ${
+              !isBuy
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-slate-50 border-slate-200"
+            }`}
+          >
+            Sell
+          </button>
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="quantity">Amount (tons):</Label>
-          <Input
-            id="quantity"
-            type="number"
-            step={1}
-            min={1}
-            max={maxAffordable}
-            value={quantity}
-            onChange={e => setQuantity(Number(e.target.value))}
-            className="w-32"
-          />
+          <div className="flex items-center gap-2">
+            <Input
+              id="quantity"
+              type="number"
+              step={1}
+              min={1}
+              max={maxAffordable}
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className="w-24"
+            />
+            <button
+              type="button"
+              className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition disabled:opacity-60"
+              disabled={isBuy ? maxAffordable <= 0 : maxAffordable <= 0}
+              onClick={isBuy ? handleBuyAll : handleSellAll}
+            >
+              {isBuy ? "Buy All" : "Sell All"}
+            </button>
+          </div>
           <span className="text-xs text-gray-400">
             {isBuy
               ? `You can buy up to ${maxAffordable} tons`
@@ -132,7 +179,8 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
         </button>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 export default MarketModal;
+
