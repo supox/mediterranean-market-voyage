@@ -120,6 +120,16 @@ const Index = () => {
 
   function handleSailButtonClick() {
     hasShownSmoothSailingToast.current = false;
+    // --- BEGIN: Ship capacity check before open Sail modal ---
+    const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+    if (totalCargo > shipCapacity) {
+      toast({
+        title: "Too Much Cargo",
+        description: `Your ship can only hold ${shipCapacity} tons. Sell or store excess cargo before setting sail.`,
+      });
+      return; // Do not open modal
+    }
+    // --- END: capacity check ---
     sailFlowRef.current?.openSailFlow();
   }
 
