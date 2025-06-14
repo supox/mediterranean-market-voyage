@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ const CargoExpansionModal: React.FC<CargoExpansionModalProps> = ({
     <Dialog open={open} onOpenChange={onDecline}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl mb-1 text-blue-900 font-bold">
+          <DialogTitle className="text-2xl mb-1 text-blue-900 font-bold w-full text-center">
             הצעה להרחבת מטען!
           </DialogTitle>
         </DialogHeader>
@@ -71,3 +72,4 @@ const CargoExpansionModal: React.FC<CargoExpansionModalProps> = ({
 };
 
 export default CargoExpansionModal;
+

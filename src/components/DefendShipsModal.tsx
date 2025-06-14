@@ -31,7 +31,7 @@ const DefendShipsModal: React.FC<DefendShipsModalProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md flex flex-col items-center">
         <DialogHeader>
-          <DialogTitle className="text-center font-bold">שכור ספינות ליווי?</DialogTitle>
+          <DialogTitle className="text-center w-full font-bold">שכור ספינות ליווי?</DialogTitle>
           <DialogDescription className="text-center mt-1">
             פעילות שודדי ים מוכרת באזור זה.
             <br />

@@ -42,7 +42,7 @@ const BankModal: React.FC<BankModalProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>בנק</DialogTitle>
+          <DialogTitle className="w-full text-center">בנק</DialogTitle>
         </DialogHeader>
         <div className="flex justify-center mb-3">
           <img

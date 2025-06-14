@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Dialog,
@@ -58,7 +59,7 @@ const DayStartModal: React.FC<DayStartModalProps> = ({
           draggable={false}
         />
         <DialogHeader>
-          <DialogTitle className="flex flex-col items-center">
+          <DialogTitle className="flex flex-col items-center w-full text-center">
             <span className="text-2xl mb-1">יום {day}</span>
             {info.icon}
             <span className="mt-2 font-bold">{info.label}</span>
@@ -81,3 +82,4 @@ const DayStartModal: React.FC<DayStartModalProps> = ({
 };
 
 export default DayStartModal;
+
