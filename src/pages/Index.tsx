@@ -200,11 +200,11 @@ const Index = () => {
           </>
         )}
       </div>
-      {/* Show static map with ship location above prices table */}
-      {!sailing && (
+      {/* Show static map with ship location above prices table — only if not game over */}
+      {!isGameOver && !sailing && (
         <MapCurrentShip country={country} onClick={handleSailButtonClick} />
       )}
-      {!sailing && (
+      {!isGameOver && !sailing && (
         <PricesTable pricesByCountry={pricesByCountry} country={country} />
       )}
       <MarketModal
