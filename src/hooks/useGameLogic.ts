@@ -53,6 +53,9 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
       setDay((prev) => {
         const newDay = prev + 1;
         cargoExpansion.maybeShowCargoExpansion(newDay);
+        setShowDayStartModal(true);
+        setJustStartedDay(newDay);
+        setNewDayWeather(weather); // weather is set before prices/advance
         return newDay;
       });
       setCurrentHour(DAY_START_HOUR);
@@ -64,6 +67,9 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
           setDay((d) => {
             const newD = d + 1;
             cargoExpansion.maybeShowCargoExpansion(newD);
+            setShowDayStartModal(true);
+            setJustStartedDay(newD);
+            setNewDayWeather(weather);
             return newD;
           });
           setPricesByCountry(generatePricesForAllCountries(COUNTRIES));
@@ -169,6 +175,20 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     eventHandlers.triggerEvent(eventType);
   }
 
+  // --- New: track when a new day starts ---
+  const [showDayStartModal, setShowDayStartModal] = useState(false);
+  const [justStartedDay, setJustStartedDay] = useState<number | null>(null);
+  const [newDayWeather, setNewDayWeather] = useState<string>("");
+
+  function closeDayStartModal() {
+    setShowDayStartModal(false);
+    setTimeout(() => {
+      // After modal closes, update weather "for the new day"
+      setWeather(getRandomWeather());
+    }, 300); // Let modal close before weather "changes"
+    setJustStartedDay(null);
+  }
+
   return {
     // Game state
     day,
@@ -239,5 +259,11 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
 
     // Also export rerouteToNavErrorTarget so Index.tsx can use it
     rerouteToNavErrorTarget: sailingLogic.rerouteToNavErrorTarget,
+
+    // New: track when a new day starts
+    showDayStartModal,
+    justStartedDay,
+    newDayWeather: newDayWeather || weather,
+    closeDayStartModal,
   };
 }

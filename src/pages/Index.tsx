@@ -12,6 +12,7 @@ import React, { useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 import CargoExpansionModal from "@/components/CargoExpansionModal";
 import MapCurrentShip from "@/components/MapCurrentShip";
+import DayStartModal from "@/components/DayStartModal";
 
 const Index = () => {
   const [mapShouldFadeOut, setMapShouldFadeOut] = useState(false);
@@ -75,6 +76,10 @@ const Index = () => {
     acceptCargoExpansion,
     declineCargoExpansion,
     rerouteToNavErrorTarget,
+    showDayStartModal,
+    justStartedDay,
+    newDayWeather,
+    closeDayStartModal,
   } = useGameLogic({
     onSailSuccess: (destination: string, hadEvent: boolean) =>
       handleSailSuccess(destination, hadEvent),
@@ -149,6 +154,12 @@ const Index = () => {
         weather={weather}
         balance={balance}
         cargo={cargoForHeader}
+      />
+      <DayStartModal
+        open={showDayStartModal}
+        day={justStartedDay || day}
+        weather={newDayWeather}
+        onClose={closeDayStartModal}
       />
       {/* Removed cargo capacity indicator just below header */}
       {/* <div className="w-full max-w-4xl mx-auto px-4 mt-2 text-right">
