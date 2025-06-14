@@ -130,11 +130,11 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     if (type === "deposit") {
       setBalance((b) => b - amount);
       setBank((bk) => bk + amount);
-      toast({ description: `Deposited ${amount} ₪` });
+      toast({ description: `הפקדת ${amount.toLocaleString()} ₪` });
     } else {
       setBalance((b) => b + amount);
       setBank((bk) => bk - amount);
-      toast({ description: `Withdrew ${amount} ₪` });
+      toast({ description: `משכת ${amount.toLocaleString()} ₪` });
     }
   }
 
