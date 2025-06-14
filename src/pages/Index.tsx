@@ -1,3 +1,4 @@
+
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -14,22 +15,23 @@ import { toast } from "@/hooks/use-toast";
 
 // Main game page, using extracted logic and focused components
 const Index = () => {
+  // For fade-out animation of map after smooth sailing
+  const [mapShouldFadeOut, setMapShouldFadeOut] = useState(false);
+  const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasShownSmoothSailingToast = useRef(false);
+
   // SAIL SUCCESS TOAST HANDLER - now also triggers fade out
   function handleSailSuccess(destination: string, hadEvent: boolean) {
-    if (!hadEvent) {
+    if (!hadEvent && !hasShownSmoothSailingToast.current) {
+      hasShownSmoothSailingToast.current = true;
       toast({
         title: "Smooth Sailing!",
         description: `You sailed to ${destination} with no incidents.`,
       });
-      // Start fade-out animation for the map.
-      setMapShouldFadeOut(true);
-      // We'll finish the sailing and UI after the fade-out duration (0.5s)
-      fadeTimeoutRef.current = setTimeout(() => {
-        setMapShouldFadeOut(false); // Clean up for next time
-        if (sailing && typeof sailing.to === "string" && typeof sailing.travelTime === "number") {
-          finishSail(sailing.to, sailing.travelTime);
-        }
-      }, 500);
+      // Start fade-out animation for the map after a short delay
+      setTimeout(() => {
+        setMapShouldFadeOut(true);
+      }, 1000); // Wait 1 second before starting fade
     }
   }
 
@@ -46,7 +48,6 @@ const Index = () => {
     cargoForHeader,
     prices,
     pricesByCountry,
-    // Modal states
     marketOpen,
     setMarketOpen,
     bankOpen,
@@ -57,7 +58,6 @@ const Index = () => {
     setEventOpen,
     eventData,
     setEventData,
-    // Actions
     handleMarketTrade,
     handleBankAction,
     handleSail,
@@ -69,7 +69,6 @@ const Index = () => {
     sailing,
     sailingPaused,
     resumeSailing,
-    // Game flags
     isGameOver,
     maxDeposit,
     maxWithdraw,
@@ -104,6 +103,7 @@ const Index = () => {
 
   function openSailFlow() {
     updatePendingSail({ open: true });
+    hasShownSmoothSailingToast.current = false; // Reset for new journey
   }
 
   function handleDestinationSelected(dest: string, travelTime: number) {
@@ -159,12 +159,6 @@ const Index = () => {
     setEventOpen(false); // closes EventModal
   }
 
-  // For fade-out animation of map after smooth sailing
-  const [mapShouldFadeOut, setMapShouldFadeOut] = useState(false);
-
-  // This ref helps us avoid calling finishSail twice
-  const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   // Defensive: clear fade timer on unmount
   React.useEffect(() => {
     return () => {
@@ -204,7 +198,7 @@ const Index = () => {
             {sailing && (
               <div
                 className={`w-full max-w-xl mx-auto border bg-white/90 rounded-xl shadow-lg p-4 animate-fade-in ${
-                  mapShouldFadeOut ? "opacity-0 transition-opacity duration-500 pointer-events-none" : "opacity-100 transition-opacity duration-500"
+                  mapShouldFadeOut ? "animate-fade-out" : ""
                 }`}
               >
                 <h3 className="font-bold text-blue-800 text-lg flex items-center gap-2 mb-2">
@@ -223,9 +217,15 @@ const Index = () => {
                     paused: sailingPaused,
                     onMidpoint: handleMapMidpoint,
                     onAnimationEnd: () => {
-                      // If we already did smooth sailing, the fade will finishSail after animation is done
-                      // so here, only trigger finishSail if fade was NOT triggered
-                      if (!mapShouldFadeOut) {
+                      // Wait for fade animation to complete if it was triggered
+                      if (mapShouldFadeOut) {
+                        setTimeout(() => {
+                          setMapShouldFadeOut(false);
+                          if (sailing && typeof sailing.to === "string" && typeof sailing.travelTime === "number") {
+                            finishSail(sailing.to, sailing.travelTime);
+                          }
+                        }, 300); // Wait for fade-out animation
+                      } else {
                         finishSail(sailing.to, sailing.travelTime);
                       }
                     },
