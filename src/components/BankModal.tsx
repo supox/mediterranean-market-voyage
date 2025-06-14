@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,7 +48,8 @@ const BankModal: React.FC<BankModalProps> = ({
             style={{ background: "#e7dbb2" }}
           />
         </div>
-        <div className="flex gap-3 mb-3 mt-2">
+        {/* Centered Deposit/Withdraw buttons */}
+        <div className="flex justify-center gap-3 mb-3 mt-2">
           <button
             onClick={() => setActiveTab("deposit")}
             className={`px-4 py-1 rounded-md border ${activeTab === "deposit" ? "bg-green-600 text-white border-green-600" : "bg-slate-50 border-slate-200"}`}
@@ -89,4 +89,3 @@ const BankModal: React.FC<BankModalProps> = ({
 };
 
 export default BankModal;
-
