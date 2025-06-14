@@ -1,4 +1,5 @@
 
+
 import { useState } from "react";
 import { getRandomWeather } from "@/utils/gameHelpers";
 import { toast } from "@/hooks/use-toast";
@@ -37,7 +38,23 @@ export function useSailing({
       toast({ title: "Cannot Sail", description: "You can't arrive after 20:00. Please rest until the next day." });
       return;
     }
-    const risk = Math.random() < (currentHour >= 18 ? 0.7 : 0.5) ? "Pirate" : null;
+    
+    // Calculate risk probabilities
+    const pirateChance = currentHour >= 18 ? 0.4 : 0.3; // 40% at night, 30% during day
+    const stormChance = 0.25; // 25% chance of storm
+    const totalEventChance = pirateChance + stormChance;
+    
+    let risk = null;
+    if (Math.random() < totalEventChance) {
+      // Determine which event occurs based on weighted probability
+      const eventRoll = Math.random() * totalEventChance;
+      if (eventRoll < pirateChance) {
+        risk = "Pirate";
+      } else {
+        risk = "Storm";
+      }
+    }
+    
     setSailingState({ from: country, to: dest, travelTime: travelDays, risk, hasEventOccurred: false });
     setSailingPausedState(false);
     setSailOpen(false);
