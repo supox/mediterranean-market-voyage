@@ -23,7 +23,7 @@ const getRandomWeather = () =>
 export default function Index() {
   const [day, setDay] = useState(1);
   const [timeOfDay, setTimeOfDay] = useState("Morning");
-  const [country, setCountry] = useState("Turkey");
+  const [country, setCountry] = useState("Israel");
   const [weather, setWeather] = useState(getRandomWeather());
   const [balance, setBalance] = useState(INITIAL_BALANCE);
   const [cargo, setCargo] = useState([...INITIAL_CARGO]);
