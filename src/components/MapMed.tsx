@@ -2,18 +2,52 @@ import React, { useEffect, useRef, useState } from "react";
 import { LOCATIONS, FLAG, getCurve } from "@/utils/mapConfig";
 import MapShip from "./MapShip";
 
-const MapMed = ({
-  country,
-  selectedCountry,
-  disabledCountries = [],
-  onSelectCountry,
-  highlightCurrent = true,
-  animateShip,
-}) => {
-  // Animate ship state
-  const [animProgress, setAnimProgress] = useState(0); // 0-1
+/** The MapMed component can work in two modes:
+ * 1. Port-selection mode (sail modal), with interactive ports (props: country, selectedCountry, disabledCountries, onSelectCountry, highlightCurrent)
+ * 2. Animation mode, for showing the sailing animation (props: animateShip + optional rest)
+ */
+type AnimationModeProps = {
+  animateShip: {
+    from: string;
+    to: string;
+    duration: number;
+    risk?: string | null;
+    paused?: boolean;
+    onMidpoint?: () => void;
+    onAnimationEnd?: () => void;
+  };
+  country?: never;
+  selectedCountry?: never;
+  disabledCountries?: never;
+  onSelectCountry?: never;
+  highlightCurrent?: never;
+};
+
+type MapModeProps = {
+  animateShip?: undefined;
+  country: string;
+  selectedCountry?: string;
+  disabledCountries?: string[];
+  onSelectCountry?: (name: string) => void;
+  highlightCurrent?: boolean;
+};
+
+type MapMedProps = AnimationModeProps | MapModeProps;
+
+const MapMed = (props: MapMedProps) => {
+  const [animProgress, setAnimProgress] = useState(0);
   const [midFired, setMidFired] = useState(false);
   const shipAnimRef = useRef<number | null>(null);
+
+  // Destructure for both modes
+  const {
+    animateShip,
+    country,
+    selectedCountry,
+    disabledCountries = [],
+    onSelectCountry,
+    highlightCurrent = true,
+  } = props as any;
 
   useEffect(() => {
     if (!animateShip) {
@@ -29,7 +63,6 @@ const MapMed = ({
     setMidFired(false);
     let start = performance.now();
     let lastElapsed = 0;
-
     function draw(now: number) {
       if (animateShip.paused) {
         shipAnimRef.current = requestAnimationFrame(draw);
@@ -49,7 +82,6 @@ const MapMed = ({
         shipAnimRef.current = null;
       }
     }
-
     function frame(now: number) {
       if (!animateShip.paused) {
         draw(now);
@@ -57,13 +89,11 @@ const MapMed = ({
         shipAnimRef.current = requestAnimationFrame(frame);
       }
     }
-
     if (animateShip.paused) {
       shipAnimRef.current = requestAnimationFrame(frame);
     } else {
       shipAnimRef.current = requestAnimationFrame(draw);
     }
-
     return () => {
       if (shipAnimRef.current) cancelAnimationFrame(shipAnimRef.current);
       shipAnimRef.current = null;
@@ -95,7 +125,6 @@ const MapMed = ({
           }}
           draggable={false}
         />
-        {/* SVG overlays for interaction & animation */}
         <svg
           width={500}
           height={380}
@@ -133,15 +162,15 @@ const MapMed = ({
             return (
               <g key={name}
                 style={{
-                  cursor: isDisabled ? "not-allowed" : (onSelectCountry ? "pointer" : "default"),
+                  cursor: animateShip ? "default" : (isDisabled ? "not-allowed" : (onSelectCountry ? "pointer" : "default")),
                   opacity: isDisabled ? 0.43 : 1,
-                  pointerEvents: "auto"
+                  pointerEvents: animateShip ? "none" : "auto"
                 }}
                 onClick={() => {
-                  if (isDisabled || !onSelectCountry) return;
+                  if (animateShip || isDisabled || !onSelectCountry) return;
                   onSelectCountry(name);
                 }}
-                tabIndex={onSelectCountry && !isDisabled ? 0 : undefined}
+                tabIndex={onSelectCountry && !animateShip && !isDisabled ? 0 : undefined}
                 aria-label={name}
               >
                 <circle
@@ -189,7 +218,6 @@ const MapMed = ({
               </g>
             );
           })}
-          {/* Animated ship */}
           {animateShip ?
             <MapShip from={animateShip.from} to={animateShip.to} animProgress={animProgress} />
             : (country && LOCATIONS[country] && (
@@ -200,5 +228,4 @@ const MapMed = ({
     </div>
   );
 };
-
 export default MapMed;

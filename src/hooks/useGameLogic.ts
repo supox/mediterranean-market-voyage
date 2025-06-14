@@ -171,8 +171,6 @@ export function useGameLogic() {
     setCountry,
     setWeather,
     advanceTime,
-    setSailing,
-    setSailingPaused,
     setSailOpen,
   });
 
