@@ -40,6 +40,7 @@ const MapMed = (props: any) => {
   const shipAnimRef = useRef<number | null>(null);
   const lastElapsedRef = useRef(0);
   const lastStartTimeRef = useRef<number | null>(null);
+  const lastFromToRef = useRef<{ from?: string; to?: string; duration?: number }>({});
 
   // Destructure for both modes
   const {
@@ -57,6 +58,7 @@ const MapMed = (props: any) => {
       setMidFired(false);
       lastElapsedRef.current = 0;
       lastStartTimeRef.current = null;
+      lastFromToRef.current = {};
       if (shipAnimRef.current) {
         cancelAnimationFrame(shipAnimRef.current);
         shipAnimRef.current = null;
@@ -64,14 +66,34 @@ const MapMed = (props: any) => {
       return;
     }
 
+    // Only reset animation progress if from/to/duration actually change (NOT when just pausing/resuming!)
+    const newKey = {
+      from: animateShip.from,
+      to: animateShip.to,
+      duration: animateShip.duration,
+    };
+
+    const prevKey = lastFromToRef.current;
+    const isNewSailing =
+      prevKey.from !== newKey.from ||
+      prevKey.to !== newKey.to ||
+      prevKey.duration !== newKey.duration;
+
+    if (isNewSailing) {
+      setAnimProgress(0);
+      setMidFired(false);
+      lastElapsedRef.current = 0;
+      lastStartTimeRef.current = null;
+      lastFromToRef.current = newKey;
+    }
+
     let raf: number;
     let cancelled = false;
 
-    const startFrom = animProgress || 0;
-    let localMidFired = midFired;
-
-    // This will record the elapsed ms already spent, so "resume" continues
+    // Use the current progress if resuming (i.e., paused), or 0 if a new journey
+    const startFrom = isNewSailing ? 0 : animProgress || 0;
     let elapsedBeforePause = startFrom * animateShip.duration;
+    let localMidFired = midFired;
 
     function draw(now: number) {
       if (cancelled) return;
@@ -99,9 +121,7 @@ const MapMed = (props: any) => {
       // When paused, stop animation loop (do not reset anything!)
       lastElapsedRef.current = animProgress * animateShip.duration;
       lastStartTimeRef.current = null;
-      // Don't animate until unpaused
     } else {
-      // When (re)starting, continue from prev progress
       lastStartTimeRef.current = null; // Will be set on first frame
       raf = requestAnimationFrame(draw);
     }
@@ -117,14 +137,13 @@ const MapMed = (props: any) => {
     animateShip?.to,
     animateShip?.duration,
     // NOTE: "paused" is intentionally NOT included here,
-    // so resuming keeps the animation progress and does not reset to zero
   ]);
 
-  // Add explicit effect to resume animation from current progress when paused state changes
+  // Resume animation when paused flag is removed; use current animProgress
   useEffect(() => {
     if (!animateShip) return;
     if (!animateShip.paused) {
-      // Resume animation from current progress
+      // Resume from current animation progress
       let raf: number;
       let cancelled = false;
 
@@ -138,7 +157,6 @@ const MapMed = (props: any) => {
         let p = Math.min(1, elapsed / animateShip.duration);
         setAnimProgress(p);
 
-        // Handle mid-point event
         if (!localMidFired && p >= 0.5) {
           if (animateShip.risk && animateShip.onMidpoint) animateShip.onMidpoint();
           setMidFired(true);
@@ -160,7 +178,6 @@ const MapMed = (props: any) => {
         if (raf) cancelAnimationFrame(raf);
       };
     }
-    // Only cares about the paused state, and animProgress
     // eslint-disable-next-line
   }, [animateShip?.paused]);
 
