@@ -1,4 +1,3 @@
-
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -193,11 +192,10 @@ const Index = () => {
         description={eventData.description}
         options={eventData.options}
         onClose={onEventClose}
-        onSelectOption={onEventSelect} {/* <-- now returns string to modal */}
+        onSelectOption={onEventSelect}
       />
     </div>
   );
 };
 
 export default Index;
-
