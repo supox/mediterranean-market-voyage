@@ -81,8 +81,8 @@ const SailModal: React.FC<SailModalProps> = ({
   const atNight = currentHour >= DEFAULT_END_HOUR;
 
   return (
-    <Dialog open={open} onOpenChange={onClose} dir="rtl">
-      <DialogContent className="max-w-xl sm:max-w-2xl" dir="rtl">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-xl sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             <span className="inline-flex items-center gap-2">

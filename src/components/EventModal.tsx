@@ -75,8 +75,8 @@ const EventModal: React.FC<EventModalProps> = ({
   const eventTitle = HE_TITLES[type] || (type ? `${type} אירוע` : "אירוע");
 
   return (
-    <Dialog open={open} onOpenChange={onClose} dir="rtl">
-      <DialogContent className="max-w-md flex flex-col items-center" dir="rtl">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md flex flex-col items-center">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 justify-center w-full">
             {isPirate ? (

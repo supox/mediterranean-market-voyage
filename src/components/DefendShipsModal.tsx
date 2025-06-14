@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -27,8 +26,8 @@ const DefendShipsModal: React.FC<DefendShipsModalProps> = ({
   const maxShips = Math.min(5, Math.floor(balance / pricePerShip));
 
   return (
-    <Dialog open={open} onOpenChange={onClose} dir="rtl">
-      <DialogContent className="max-w-md flex flex-col items-center" dir="rtl">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md flex flex-col items-center">
         <DialogHeader>
           <DialogTitle className="text-center font-bold">שכור ספינות ליווי?</DialogTitle>
           <DialogDescription className="text-center mt-1">

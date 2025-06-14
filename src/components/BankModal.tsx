@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,8 +34,8 @@ const BankModal: React.FC<BankModalProps> = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose} dir="rtl">
-      <DialogContent className="max-w-sm sm:max-w-md" dir="rtl">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-sm sm:max-w-md">
         <DialogHeader>
           <DialogTitle>בנק</DialogTitle>
         </DialogHeader>

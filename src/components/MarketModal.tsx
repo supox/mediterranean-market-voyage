@@ -74,8 +74,8 @@ const MarketModal: React.FC<MarketModalProps> = ({
   const marketImage = countryImages[country];
 
   return (
-    <Dialog open={open} onOpenChange={onClose} dir="rtl">
-      <DialogContent className="max-w-sm sm:max-w-md" dir="rtl">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-sm sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isBuy ? "קנה סחורה" : "מכור סחורה"}</DialogTitle>
         </DialogHeader>
