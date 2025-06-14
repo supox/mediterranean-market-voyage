@@ -1,3 +1,4 @@
+
 import { Banknote, MapPin, Ship, Clock, Sun, CloudRain, Wheat, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +47,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   const dayIdx = ((day - 1) % 7 + 7) % 7; // ensure 0-based, handles edge cases
   const dayName = DAY_NAMES[dayIdx];
   return (
-    <div className="w-full bg-gradient-to-b from-blue-100 via-blue-50 to-white border-b border-blue-300 py-2 px-4 flex flex-col md:flex-row items-center md:justify-between gap-4 shadow-sm">
+    <div className="w-full bg-gradient-to-b from-blue-100 via-blue-50 to-white border-b border-blue-300 py-2 px-4 flex flex-col md:flex-row items-center md:justify-between gap-4 shadow-sm sticky top-0 z-30">
       {/* Left: Status */}
       <div className="flex items-center gap-5 text-xl font-medium">
         <span className="flex items-center gap-2">
@@ -98,3 +99,4 @@ const GameHeader: React.FC<GameHeaderProps> = ({
 };
 
 export default GameHeader;
+
