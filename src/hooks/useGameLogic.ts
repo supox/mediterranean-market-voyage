@@ -133,7 +133,6 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
 
   function handleRest() {
     advanceTime("rest");
-    toast({ title: "Rested", description: "Night passes peacefully in the harbor." });
   }
 
   function resetGame() {
