@@ -34,6 +34,13 @@ type MapModeProps = {
 
 type MapMedProps = AnimationModeProps | MapModeProps;
 
+// Hebrew country names
+const COUNTRY_LABELS: Record<string, string> = {
+  Turkey: "טורקיה",
+  Israel: "ישראל",
+  Egypt: "מצרים",
+};
+
 const MapMed = (props: any) => {
   const [animProgress, setAnimProgress] = useState(0);
   const [midFired, setMidFired] = useState(false);
@@ -185,9 +192,9 @@ const MapMed = (props: any) => {
             pointerEvents: "none",
           }}
         >
-          {animateShip &&
+          {props.animateShip &&
             <path
-              d={getCurve(LOCATIONS[animateShip.from], LOCATIONS[animateShip.to])}
+              d={getCurve(LOCATIONS[props.animateShip.from], LOCATIONS[props.animateShip.to])}
               stroke="#2563eb"
               strokeWidth={3.5}
               fill="none"
@@ -197,26 +204,26 @@ const MapMed = (props: any) => {
             />
           }
           {Object.entries(LOCATIONS).map(([name, { x, y }]) => {
-            const isSelected = selectedCountry === name;
-            const isDisabled = disabledCountries.includes(name);
-            const isCurrent = country === name;
+            const isSelected = props.selectedCountry === name;
+            const isDisabled = (props.disabledCountries || []).includes(name);
+            const isCurrent = props.country === name;
             const markerColor = isSelected
               ? "#4299e1"
-              : isCurrent && highlightCurrent
+              : isCurrent && props.highlightCurrent
                 ? "#16a34a"
                 : "#fff9";
             return (
               <g key={name}
                 style={{
-                  cursor: animateShip ? "default" : (isDisabled ? "not-allowed" : (onSelectCountry ? "pointer" : "default")),
+                  cursor: props.animateShip ? "default" : (isDisabled ? "not-allowed" : (props.onSelectCountry ? "pointer" : "default")),
                   opacity: isDisabled ? 0.43 : 1,
-                  pointerEvents: animateShip ? "none" : "auto"
+                  pointerEvents: props.animateShip ? "none" : "auto"
                 }}
                 onClick={() => {
-                  if (animateShip || isDisabled || !onSelectCountry) return;
-                  onSelectCountry(name);
+                  if (props.animateShip || isDisabled || !props.onSelectCountry) return;
+                  props.onSelectCountry(name);
                 }}
-                tabIndex={onSelectCountry && !animateShip && !isDisabled ? 0 : undefined}
+                tabIndex={props.onSelectCountry && !props.animateShip && !isDisabled ? 0 : undefined}
                 aria-label={name}
               >
                 <circle
@@ -229,7 +236,7 @@ const MapMed = (props: any) => {
                   style={{
                     filter: isSelected
                       ? "drop-shadow(0 0 6px #2563eb66)"
-                      : isCurrent && highlightCurrent
+                      : isCurrent && props.highlightCurrent
                         ? "drop-shadow(0 0 8px #16a34a66)"
                         : "none"
                   }}
@@ -259,15 +266,15 @@ const MapMed = (props: any) => {
                     textShadow: "1px 1px 3px #fff8, 0px 0px 6px #fff8"
                   }}
                 >
-                  {name}
+                  {COUNTRY_LABELS[name] ?? name}
                 </text>
               </g>
             );
           })}
-          {animateShip ?
-            <MapShip from={animateShip.from} to={animateShip.to} animProgress={animProgress} />
-            : (country && LOCATIONS[country] && (
-              <MapShip from={country} to={country} animProgress={0} />
+          {props.animateShip ?
+            <MapShip from={props.animateShip.from} to={props.animateShip.to} animProgress={animProgress} />
+            : (props.country && LOCATIONS[props.country] && (
+              <MapShip from={props.country} to={props.country} animProgress={0} />
             ))}
         </svg>
       </div>

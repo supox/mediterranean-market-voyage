@@ -1,6 +1,13 @@
 
 import { Banknote, Ship, Store, Clock } from "lucide-react";
 
+// Hebrew country names for reference
+const COUNTRY_LABELS: Record<string, string> = {
+  Turkey: "טורקיה",
+  Israel: "ישראל",
+  Egypt: "מצרים",
+};
+
 interface ActionPanelProps {
   onMarket: () => void;
   onBank: () => void;
@@ -26,7 +33,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
         disabled={disabled}
       >
         <Store size={34} className="mb-2 text-yellow-700" />
-        <span className="font-semibold text-lg">גש לשוק</span>
+        <span className="font-semibold text-lg">לך לשוק</span>
       </button>
       <button
         onClick={onBank}
@@ -34,7 +41,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
         disabled={disabled}
       >
         <Banknote size={34} className="mb-2 text-green-700" />
-        <span className="font-semibold text-lg">גש לבנק</span>
+        <span className="font-semibold text-lg">בנק</span>
       </button>
       <button
         onClick={onSail}

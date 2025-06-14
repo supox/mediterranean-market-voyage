@@ -1,7 +1,13 @@
-
 import React from "react";
 import { LOCATIONS, FLAG } from "@/utils/mapConfig";
 import MapShip from "./MapShip";
+
+// Hebrew country names
+const COUNTRY_LABELS: Record<string, string> = {
+  Turkey: "טורקיה",
+  Israel: "ישראל",
+  Egypt: "מצרים",
+};
 
 type MapCurrentShipProps = {
   country: string;
@@ -100,7 +106,7 @@ const MapCurrentShip: React.FC<MapCurrentShipProps> = ({ country, onClick }) => 
                     textShadow: "1px 1px 3px #fff8, 0px 0px 6px #fff8"
                   }}
                 >
-                  {name}
+                  {COUNTRY_LABELS[name] ?? name}
                 </text>
               </g>
             );
@@ -115,4 +121,3 @@ const MapCurrentShip: React.FC<MapCurrentShipProps> = ({ country, onClick }) => 
 };
 
 export default MapCurrentShip;
-
