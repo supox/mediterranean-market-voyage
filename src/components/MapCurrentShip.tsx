@@ -1,15 +1,30 @@
+
 import React from "react";
 import { LOCATIONS, FLAG } from "@/utils/mapConfig";
 import MapShip from "./MapShip";
 
 type MapCurrentShipProps = {
   country: string;
+  onClick?: () => void;
 };
 
-const MapCurrentShip: React.FC<MapCurrentShipProps> = ({ country }) => {
+const MapCurrentShip: React.FC<MapCurrentShipProps> = ({ country, onClick }) => {
   return (
     <div className="w-full flex justify-center my-4 animate-fade-in">
-      <div className="relative rounded-xl shadow-lg border bg-cyan-900 max-w-full h-56 aspect-[500/380] overflow-hidden" style={{ width: 500, height: 380 }}>
+      <div
+        className={`relative rounded-xl shadow-lg border bg-cyan-900 max-w-full h-56 aspect-[500/380] overflow-hidden transition ring-2 ring-transparent hover:ring-blue-400 cursor-pointer`}
+        style={{ width: 500, height: 380 }}
+        onClick={onClick}
+        tabIndex={0}
+        aria-label="Go to Sail"
+        role="button"
+        onKeyDown={(e) => {
+          if (onClick && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+      >
         <img
           src="/lovable-uploads/65af5864-7834-4eda-8f8c-a0f7e4772f3d.png"
           alt="Mediterranean map"
@@ -100,3 +115,4 @@ const MapCurrentShip: React.FC<MapCurrentShipProps> = ({ country }) => {
 };
 
 export default MapCurrentShip;
+

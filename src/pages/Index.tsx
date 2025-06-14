@@ -177,7 +177,7 @@ const Index = () => {
       </div>
       {/* Show static map with ship location above prices table */}
       {!sailing && (
-        <MapCurrentShip country={country} />
+        <MapCurrentShip country={country} onClick={handleSailButtonClick} />
       )}
       {!sailing && (
         <PricesTable pricesByCountry={pricesByCountry} country={country} />
