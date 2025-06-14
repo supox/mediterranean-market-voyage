@@ -1,4 +1,5 @@
-import { Banknote, MapPin, Ship, Clock, Sun, CloudRain, Wheat, Coins } from "lucide-react";
+
+import { Banknote, MapPin, Ship, Clock, Sun, CloudRain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Good = { type: "Wheat" | "Olives" | "Copper"; amount: number };
@@ -29,9 +30,9 @@ const DAY_NAMES = [
 ];
 
 function GoodIcon({ name }: { name: string }) {
-  if (name === "Wheat") return <Wheat size={16} className="text-amber-500" />;
-  if (name === "Olives") return <Coins size={16} className="text-green-600" />;
-  if (name === "Copper") return <Coins size={16} className="text-orange-700" />;
+  if (name === "Wheat") return <span className="text-xl">🌾</span>;
+  if (name === "Olives") return <span className="text-xl">🫒</span>;
+  if (name === "Copper") return <span className="text-xl">🥉</span>;
   return null;
 }
 
