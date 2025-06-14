@@ -5,6 +5,7 @@ import BankModal from "@/components/BankModal";
 import SailModal from "@/components/SailModal";
 import EventModal from "@/components/EventModal";
 import GameOver from "@/components/GameOver";
+import PricesTable from "@/components/PricesTable";
 import { useGameLogic } from "@/hooks/useGameLogic";
 
 // Main game page, using extracted logic and focused components
@@ -60,6 +61,7 @@ const Index = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow">
           🌊 Merchant of the Mediterranean
         </h1>
+        <PricesTable />
         {isGameOver ? (
           <GameOver balance={balance} cargo={cargo} onPlayAgain={resetGame} />
         ) : (
