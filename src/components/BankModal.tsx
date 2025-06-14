@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,10 @@ const BankModal: React.FC<BankModalProps> = ({
     }
   }
 
+  function handleSetAll() {
+    setAmount(activeTab === "deposit" ? maxDeposit : maxWithdraw);
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm sm:max-w-md">
@@ -58,7 +63,20 @@ const BankModal: React.FC<BankModalProps> = ({
           >משיכה</button>
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="bank-amount">{activeTab === "deposit" ? "סכום הפקדה" : "סכום משיכה"}:</Label>
+          <Label htmlFor="bank-amount" className="flex items-center justify-between">
+            {activeTab === "deposit" ? "סכום הפקדה" : "סכום משיכה"}:
+            <button
+              type="button"
+              className="text-xs px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 border ml-2"
+              onClick={handleSetAll}
+              disabled={
+                (activeTab === "deposit" && maxDeposit === 0) ||
+                (activeTab === "withdraw" && maxWithdraw === 0)
+              }
+            >
+              הכל
+            </button>
+          </Label>
           <Input
             id="bank-amount"
             type="number"
@@ -87,3 +105,4 @@ const BankModal: React.FC<BankModalProps> = ({
 };
 
 export default BankModal;
+
