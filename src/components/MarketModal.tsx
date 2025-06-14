@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,7 +53,7 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
         {/* Image for Market popup */}
         <div className="flex justify-center mb-3">
           <img
-            src="/lovable-uploads/65af5864-7834-4eda-8f8c-a0f7e4772f3d.png"
+            src="/lovable-uploads/b9972723-2bb9-4b5c-a63c-fff1ab433467.png"
             alt="Marketplace Illustration"
             className="w-32 h-32 object-contain rounded-md shadow"
             style={{ background: "#f2e6c9" }}
