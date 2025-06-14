@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
@@ -7,12 +6,13 @@ import BankModal from "@/components/BankModal";
 import SailModal from "@/components/SailModal";
 import EventModal from "@/components/EventModal";
 import { toast } from "@/hooks/use-toast";
+import { Wheat, Coins } from "lucide-react";
 
-const INITIAL_BALANCE = 1500;
+const INITIAL_BALANCE = 5000;
 const INITIAL_CARGO = [
-  { type: "Wheat", amount: 12 },
-  { type: "Olives", amount: 8 },
-  { type: "Copper", amount: 3 },
+  { type: "Wheat", amount: 0 },
+  { type: "Olives", amount: 0 },
+  { type: "Copper", amount: 0 },
 ];
 const ALL_COUNTRIES = ["Turkey", "Israel", "Greece", "Cyprus", "Egypt"];
 const WEATHER_TYPES = ["Sunny", "Stormy", "Overcast"];
@@ -158,11 +158,23 @@ export default function Index() {
     toast({ title: "Rested", description: "Night passes peacefully in the harbor." });
   }
 
-  // Calculate goods for header
+  // Calculate goods for header: conform to Good[] types
   const cargoForHeader = [
-    { type: "Wheat", amount: cargoGood("Wheat").amount, icon: "🌾" },
-    { type: "Olives", amount: cargoGood("Olives").amount, icon: "🫒" },
-    { type: "Copper", amount: cargoGood("Copper").amount, icon: "🥉" },
+    {
+      type: "Wheat" as const,
+      amount: cargoGood("Wheat").amount,
+      icon: <Wheat size={16} className="text-amber-500" />,
+    },
+    {
+      type: "Olives" as const,
+      amount: cargoGood("Olives").amount,
+      icon: <Coins size={16} className="text-green-600" />,
+    },
+    {
+      type: "Copper" as const,
+      amount: cargoGood("Copper").amount,
+      icon: <Coins size={16} className="text-orange-700" />,
+    },
   ];
 
   // End game after Day 7
