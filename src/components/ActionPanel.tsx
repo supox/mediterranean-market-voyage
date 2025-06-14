@@ -1,3 +1,4 @@
+
 import { Banknote, Ship, Store, Clock } from "lucide-react";
 
 interface ActionPanelProps {
@@ -9,11 +10,6 @@ interface ActionPanelProps {
   country: string;
 }
 
-const countryImages: { [key: string]: string } = {
-  Turkey: "/lovable-uploads/b04ca857-7db0-4cc0-b5f5-5a56f7541f3a.png",
-  Israel: "/lovable-uploads/5fc74a15-7429-49de-92cf-168edb5edf56.png",
-};
-
 const ActionPanel: React.FC<ActionPanelProps> = ({
   onMarket,
   onBank,
@@ -22,8 +18,6 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
   disabled,
   country,
 }) => {
-  const marketImage = countryImages[country];
-
   return (
     <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
       <button
@@ -31,15 +25,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
         className="flex flex-col items-center p-5 bg-gradient-to-b from-yellow-50 to-white border border-yellow-100 rounded-xl shadow hover:scale-[1.03] focus:ring-2 focus:ring-blue-200 transition-all duration-150"
         disabled={disabled}
       >
-        {marketImage ? (
-          <img
-            src={marketImage}
-            alt={`Market in ${country}`}
-            className="w-full h-20 object-cover rounded-md mb-2"
-          />
-        ) : (
-          <Store size={34} className="mb-2 text-yellow-700" />
-        )}
+        <Store size={34} className="mb-2 text-yellow-700" />
         <span className="font-semibold text-lg">Go to Market</span>
       </button>
       <button

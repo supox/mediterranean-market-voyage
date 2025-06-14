@@ -1,4 +1,3 @@
-
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -164,6 +163,7 @@ const Index = () => {
         balance={balance}
         cargo={cargo}
         prices={prices}
+        country={country}
       />
       <BankModal
         open={bankOpen}

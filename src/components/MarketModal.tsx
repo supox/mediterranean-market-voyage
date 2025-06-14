@@ -21,11 +21,17 @@ interface MarketModalProps {
   onTrade: (type: string, quantity: number, isBuy: boolean) => void;
   balance: number;
   cargo: { type: string; amount: number }[];
-  // CRITICAL: prices for current country for the current day
   prices: { Wheat: number; Olives: number; Copper: number };
+  country: string;
 }
 
-const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance, cargo, prices }) => {
+const countryImages: { [key: string]: string } = {
+  Turkey: "/lovable-uploads/b04ca857-7db0-4cc0-b5f5-5a56f7541f3a.png",
+  Israel: "/lovable-uploads/5fc74a15-7429-49de-92cf-168edb5edf56.png",
+  // Add more here as you upload for other countries
+};
+
+const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance, cargo, prices, country }) => {
   const [type, setType] = useState("Wheat");
   const [quantity, setQuantity] = useState(0);
   const [isBuy, setIsBuy] = useState(true);
@@ -44,6 +50,8 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
     }
   }
 
+  const marketImage = countryImages[country];
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm sm:max-w-md">
@@ -52,12 +60,21 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
         </DialogHeader>
         {/* Image for Market popup */}
         <div className="flex justify-center mb-3">
-          <img
-            src="/lovable-uploads/b9972723-2bb9-4b5c-a63c-fff1ab433467.png"
-            alt="Marketplace Illustration"
-            className="w-32 h-32 object-contain rounded-md shadow"
-            style={{ background: "#f2e6c9" }}
-          />
+          {marketImage ? (
+            <img
+              src={marketImage}
+              alt={`Marketplace in ${country}`}
+              className="w-32 h-32 object-contain rounded-md shadow"
+              style={{ background: "#f2e6c9" }}
+            />
+          ) : (
+            <img
+              src="/lovable-uploads/b9972723-2bb9-4b5c-a63c-fff1ab433467.png"
+              alt="Marketplace Illustration"
+              className="w-32 h-32 object-contain rounded-md shadow"
+              style={{ background: "#f2e6c9" }}
+            />
+          )}
         </div>
         <div className="flex gap-3 items-center mt-1 mb-2">
           {GOODS.map(g => (
