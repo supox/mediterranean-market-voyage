@@ -168,17 +168,54 @@ export function useEventHandlers({
     let desc = "";
     if (val === "escape") {
       // Each defend ship slightly increases escape success chance
-      const chance = 0.45 + sailingLogic.sailing?.risk === "Pirate" ? 0.07 : 0;
+      const chance = 0.45 + (sailingLogic.sailing?.risk === "Pirate" ? 0.07 : 0);
       if (Math.random() < chance) {
         desc = "You escape using clever maneuvers and your hired escorts!";
       } else {
-        desc = "Despite your best efforts, pirates catch up. Brace for battle!";
-        // If no cargo, lose coins instead
+        // Pirates catch up — update logic to take 30%-80% of cargo
         const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
         if (totalCargo === 0) {
+          // If no cargo, lose coins instead
           const coinLoss = 200 + Math.floor(Math.random() * 300); // 200-500 coins
           setBalance(b => Math.max(0, b - coinLoss));
-          desc += ` You pay ${coinLoss} ₪ to the pirates.`;
+          desc = `You failed to escape. The pirates catch up and, finding no goods, demand ${coinLoss} ₪.`;
+        } else {
+          // Pirates take 30-80% of all cargo, at least 1 ton
+          const lossPercent = 0.3 + Math.random() * 0.5; // 30% to 80%
+          let totalToLose = Math.max(1, Math.floor(totalCargo * lossPercent));
+          let lostCargoMessage = "";
+          // Prioritize taking from the largest cargo type
+          let updatedCargo = [...cargo];
+          let cargoLost: { type: string, amount: number }[] = [];
+          while (totalToLose > 0) {
+            // Find the cargo type with the most units left to be stolen
+            let maxIndex = -1;
+            let maxAmount = 0;
+            for (let i = 0; i < updatedCargo.length; i++) {
+              if (updatedCargo[i].amount > maxAmount) {
+                maxAmount = updatedCargo[i].amount;
+                maxIndex = i;
+              }
+            }
+            if (maxIndex === -1 || maxAmount === 0) break;
+            // Take as much as possible from this type
+            const take = Math.min(updatedCargo[maxIndex].amount, totalToLose);
+            if (take > 0) {
+              cargoLost.push({ type: updatedCargo[maxIndex].type, amount: take });
+              updatedCargo[maxIndex] = { ...updatedCargo[maxIndex], amount: updatedCargo[maxIndex].amount - take };
+              totalToLose -= take;
+            } else {
+              break;
+            }
+          }
+          setCargo(updatedCargo);
+          // Format the loot message
+          if (cargoLost.length === 1) {
+            lostCargoMessage = `${cargoLost[0].amount} tons of ${cargoLost[0].type}`;
+          } else if (cargoLost.length > 1) {
+            lostCargoMessage = cargoLost.map(x => `${x.amount} ${x.type}`).join(", ");
+          }
+          desc = `You failed to escape. The pirates catch up and steal ${lostCargoMessage} from your cargo hold!`;
         }
       }
     }
