@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Map } from "lucide-react";
 import { useState } from "react";
@@ -84,12 +85,18 @@ const SailModal: React.FC<SailModalProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-xl sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle
+            className="text-center w-full"
+            dir="rtl"
+          >
             <span className="inline-flex items-center gap-2">
               <Map size={20} /> בחר יעד הפלגה
             </span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription
+            className="text-center w-full"
+            dir="rtl"
+          >
             {atNight
               ? "מאוחר מדי לצאת להפלגה. יש לנוח עד הבוקר."
               : "לחץ על נמל נגיש במפה. יעדים לא זמינים יהיו באפור."}
@@ -134,3 +141,4 @@ const SailModal: React.FC<SailModalProps> = ({
 };
 
 export default SailModal;
+
