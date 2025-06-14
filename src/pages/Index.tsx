@@ -145,7 +145,7 @@ const Index = () => {
           Cargo Limit: {cargo.reduce((a, c) => a + c.amount, 0)}/{shipCapacity} tons
         </span>
       </div> */}
-      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center pt-10 pb-44 px-3">
+      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center pt-10 pb-12 px-3">
         <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow">
           🌊 Merchant of the Mediterranean
         </h1>
