@@ -17,3 +17,5 @@ export function getRandomWeather() {
 export function formatTime(hour: number) {
   return hour.toString().padStart(2, "0") + ":00";
 }
+
+export const SHIP_CAPACITY = 100;

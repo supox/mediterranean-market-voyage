@@ -10,6 +10,7 @@ import {
   getRandomWeather,
   formatTime,
   COUNTRIES,
+  SHIP_CAPACITY,
 } from "@/utils/gameHelpers";
 import { useSailing } from "./useSailing";
 
@@ -283,12 +284,56 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
   }
 
   function handleDesertedShipsEvent() {
-    // Random cargo gain (1-3 tons of random goods)
+    // New logic: gain is based on player's total value and is capped by ship capacity.
+    const totalValue = balance + cargoValue;
+    const gainPercentage = 0.05 + Math.random() * 0.15; // 5-20%
+    const gainedValue = totalValue * gainPercentage;
+
+    const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+    const availableSpace = SHIP_CAPACITY - totalCargo;
+
+    if (availableSpace <= 0) {
+      const description = `You discover a fleet of deserted ships, but your cargo hold is full! You have to leave the potential salvage behind.`;
+      setEventData({ type: "Deserted Ships", description, options: [] });
+      setEventOpen(true);
+      sailingLogic.pauseSailing();
+      return;
+    }
+
+    const destination = sailingLogic.sailing?.to;
+    if (!destination) {
+      console.error("Sailing destination not found for deserted ships event");
+      const description = `You spot deserted ships, but strong currents prevent you from getting close. You continue your journey.`;
+      setEventData({ type: "Deserted Ships", description, options: [] });
+      setEventOpen(true);
+      sailingLogic.pauseSailing();
+      return;
+    }
+
     const cargoTypes = ["Wheat", "Olives", "Copper"];
-    const randomType = cargoTypes[Math.floor(Math.random() * cargoTypes.length)];
-    const gainAmount = 1 + Math.floor(Math.random() * 3); // 1-3 tons
-    
-    // Add cargo to player's inventory
+    const randomType = cargoTypes[Math.floor(Math.random() * cargoTypes.length)] as keyof typeof prices;
+    const price = pricesByCountry[destination]?.[randomType];
+
+    if (!price || price <= 0) {
+      console.error(`Price for ${randomType} in ${destination} not found or is zero.`);
+      const description = `The deserted ships seem to have been picked clean. You find nothing of value.`;
+      setEventData({ type: "Deserted Ships", description, options: [] });
+      setEventOpen(true);
+      sailingLogic.pauseSailing();
+      return;
+    }
+
+    let gainAmount = Math.floor(gainedValue / price);
+    gainAmount = Math.min(gainAmount, availableSpace);
+
+    if (gainAmount <= 0) {
+      const description = `You discover a fleet of deserted ships. After a search, you find some supplies but no significant cargo to add to your hold.`;
+      setEventData({ type: "Deserted Ships", description, options: [] });
+      setEventOpen(true);
+      sailingLogic.pauseSailing();
+      return;
+    }
+
     setCargo((prev) => {
       const found = prev.find((g) => g.type === randomType);
       if (found) {
@@ -301,12 +346,11 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     });
 
     const description = `You discover a fleet of deserted ships drifting in the waters. After searching through them, you salvage ${gainAmount} tons of ${randomType} from their cargo holds.`;
-    
-    // Show deserted ships result without options
+
     setEventData({
       type: "Deserted Ships",
       description,
-      options: [], // No options for deserted ships
+      options: [],
     });
     setEventOpen(true);
     sailingLogic.pauseSailing();
