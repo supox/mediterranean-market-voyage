@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { generatePricesForAllCountries } from "@/utils/pricing";
@@ -242,22 +243,24 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     const lossPercentage = 0.1 + Math.random() * 0.2; // 10-30%
     let cargoLost: Array<{ type: string; amount: number }> = [];
     
-    setCargo((prev) => {
-      return prev.map((good) => {
-        if (good.amount > 0) {
-          const lostAmount = Math.floor(good.amount * lossPercentage);
-          if (lostAmount > 0) {
-            cargoLost.push({ type: good.type, amount: lostAmount });
-            return { ...good, amount: good.amount - lostAmount };
-          }
+    // Calculate losses before updating state
+    const updatedCargo = cargo.map((good) => {
+      if (good.amount > 0) {
+        const lostAmount = Math.floor(good.amount * lossPercentage);
+        if (lostAmount > 0) {
+          cargoLost.push({ type: good.type, amount: lostAmount });
+          return { ...good, amount: good.amount - lostAmount };
         }
-        return good;
-      });
+      }
+      return good;
     });
+
+    // Update cargo state
+    setCargo(updatedCargo);
 
     // Create description of what was lost
     const lostItems = cargoLost.map(item => `${item.amount} tons of ${item.type}`).join(", ");
-    const description = `A violent storm hits your ship! Cargo is thrown overboard to keep the ship stable. You lose: ${lostItems}.`;
+    const description = `A violent storm hits your ship! Cargo is thrown overboard to keep the ship stable. You lose ${lostItems}.`;
     
     // Show storm result without options
     setEventData({
