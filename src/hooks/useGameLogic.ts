@@ -50,6 +50,14 @@ export function useGameLogic() {
   const cargoGood = (type: string) =>
     cargo.find((g) => g.type === type) || { type, amount: 0 };
 
+  // Add ship animation state
+  const [sailing, setSailing] = useState<null | {
+    from: string;
+    to: string;
+    travelTime: number;
+    risk: string | null; // event type, e.g. "Pirate", "Storm", etc.
+  }>(null);
+
   // Only advances the day if "rest" is called
   function advanceTime(hours: number | "rest") {
     if (hours === "rest") {
@@ -112,50 +120,60 @@ export function useGameLogic() {
     // No time advance for bank
   }
 
-  // Sailing: do NOT regenerate prices, just move port/country
-  function handleSail(dest: string, travelDays: number) {
-    const travelHours = Math.round(travelDays * 12);
+  // New: start ship animation instead of instantly moving country
+  function startSail(dest: string, travelDays: number) {
     // Only sail if arrival is before or at 20:00
+    const travelHours = Math.round(travelDays * 12);
     if (currentHour + travelHours > DAY_END_HOUR) {
       toast({ title: "Cannot Sail", description: "You can't arrive after 20:00. Please rest until the next day." });
       return;
     }
-    const risk =
-      Math.random() < (currentHour >= 18 ? 0.18 : 0.1)
-        ? "Pirate"
-        : null;
+    // Determine if there will be an event, but don't show yet!
+    const risk = Math.random() < (currentHour >= 18 ? 0.18 : 0.10) ? "Pirate" : null;
+    setSailing({ from: country, to: dest, travelTime: travelDays, risk });
+    setSailOpen(false); // Close the modal to animate map
+  }
 
+  // Called when animation finishes (or after event resolved)
+  function finishSail(dest: string, travelDays: number) {
     setCountry(dest);
     setWeather(getRandomWeather());
     advanceTime(Math.round(travelDays * 12));
+    setSailing(null);
+  }
 
-    if (risk) {
-      setEventData({
-        type: "Pirate",
-        description:
-          "Pirate ships approach! Will you try to Escape, Negotiate, or Fight Back?",
-        options: [
-          { label: "Escape", value: "escape" },
-          { label: "Negotiate", value: "negotiate" },
-          { label: "Fight Back", value: "fight" },
-        ],
-      });
-      setTimeout(() => setEventOpen(true), 700);
-    } else {
-      toast({ title: `Arrived: ${dest}`, description: `You sailed safely!` });
+  // Called when event occurs during sailing
+  function triggerEvent(risk: string) {
+    let desc = "";
+    let options = [];
+    if (risk === "Pirate") {
+      desc = "Pirate ships approach! Will you try to Escape, Negotiate, or Fight Back?";
+      options = [
+        { label: "Escape", value: "escape" },
+        { label: "Negotiate", value: "negotiate" },
+        { label: "Fight Back", value: "fight" },
+      ];
     }
+    // Add more types if needed
+    setEventData({
+      type: risk,
+      description: desc,
+      options,
+    });
+    setEventOpen(true);
   }
 
   function handleEventOption(val: string) {
     let desc = "";
-    if (val === "escape")
-      desc = "You attempt to flee... and narrowly evade capture!";
-    if (val === "negotiate")
-      desc =
-        "A payment is made — the pirates let you go with most of your cargo.";
-    if (val === "fight")
-      desc = "Battle ensues! You win, and plunder some coin from the pirates.";
+    if (val === "escape") desc = "You attempt to flee... and narrowly evade capture!";
+    if (val === "negotiate") desc = "A payment is made — the pirates let you go with most of your cargo.";
+    if (val === "fight") desc = "Battle ensues! You win, and plunder some coin from the pirates.";
     toast({ title: "Event Outcome", description: desc });
+
+    // If currently sailing, finish sail after event
+    if (sailing) {
+      finishSail(sailing.to, sailing.travelTime);
+    }
   }
 
   function handleRest() {
@@ -224,7 +242,10 @@ export function useGameLogic() {
     // Actions
     handleMarketTrade,
     handleBankAction,
-    handleSail,
+    handleSail: startSail, // note: changed name for animation API
+    finishSail,
+    triggerEvent,
+    sailing, // new, for animation
     handleEventOption,
     handleRest,
     resetGame,

@@ -40,10 +40,13 @@ const Index = () => {
     // Actions
     handleMarketTrade,
     handleBankAction,
-    handleSail,
+    handleSail, // now triggers animation
     handleEventOption,
     handleRest,
     resetGame,
+    finishSail, // called when animation ends or after event
+    triggerEvent, // called at midpoint if risk exists
+    sailing, // { from, to, travelTime, risk }
 
     // Game flags
     isGameOver,
@@ -65,21 +68,55 @@ const Index = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow">
           🌊 Merchant of the Mediterranean
         </h1>
+        {/* Show action panel unless sailing is in progress */}
         {isGameOver ? (
           <GameOver balance={balance} cargo={cargo} onPlayAgain={resetGame} />
         ) : (
           <>
-            <ActionPanel
-              onMarket={() => setMarketOpen(true)}
-              onBank={() => setBankOpen(true)}
-              onSail={() => setSailOpen(true)}
-              onRest={handleRest}
-              disabled={isGameOver}
-            />
+            {!sailing && (
+              <ActionPanel
+                onMarket={() => setMarketOpen(true)}
+                onBank={() => setBankOpen(true)}
+                onSail={() => setSailOpen(true)}
+                onRest={handleRest}
+                disabled={isGameOver}
+              />
+            )}
+            {/* When sailing, show the animated map */}
+            {sailing && (
+              <div className="w-full max-w-xl mx-auto border bg-white/90 rounded-xl shadow-lg p-4 animate-fade-in">
+                <h3 className="font-bold text-blue-800 text-lg flex items-center gap-2 mb-2">
+                  <span>🧭 Sailing from <span className="font-semibold">{sailing.from}</span> to <span className="font-semibold">{sailing.to}</span>...</span>
+                </h3>
+                <MapMed
+                  // Ship animates from `sailing.from` to `sailing.to`
+                  animateShip={{
+                    from: sailing.from,
+                    to: sailing.to,
+                    duration: 10_000, // ms
+                    risk: sailing.risk,
+                    onMidpoint: () => {
+                      // If event to trigger, do it now
+                      if (sailing.risk) {
+                        triggerEvent(sailing.risk);
+                      }
+                    },
+                    onAnimationEnd: () => {
+                      finishSail(sailing.to, sailing.travelTime);
+                    }
+                  }}
+                  // Highlight only traveling, not market
+                />
+                <div className="text-blue-700 mt-2 text-center text-sm font-medium">The ship is at sea. Please wait...</div>
+              </div>
+            )}
           </>
         )}
       </div>
-      <PricesTable pricesByCountry={pricesByCountry} country={country} />
+      {/* Only show prices if not sailing */}
+      {!sailing && (
+        <PricesTable pricesByCountry={pricesByCountry} country={country} />
+      )}
       <MarketModal
         open={marketOpen}
         onClose={() => setMarketOpen(false)}

@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Map } from "lucide-react";
 import { useState } from "react";
@@ -43,7 +42,7 @@ const SailModal: React.FC<SailModalProps> = ({
   onClose,
   onSail,
   currentCountry,
-  currentHour = DEFAULT_START_HOUR, // fallback if not provided
+  currentHour = DEFAULT_START_HOUR,
 }) => {
   const [dest, setDest] = useState<string | null>(null);
 
@@ -138,4 +137,3 @@ const SailModal: React.FC<SailModalProps> = ({
 };
 
 export default SailModal;
-

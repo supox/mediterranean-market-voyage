@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Ship } from "lucide-react";
 
 // Map coordinates for each country (relative to this map image, manually adjusted)
@@ -19,12 +19,30 @@ const FLAG = {
   Egypt: "🇪🇬",
 };
 
+type AnimateShipProps = {
+  from: string;
+  to: string;
+  duration: number; // ms 
+  risk: string | null;
+  onMidpoint: () => void;
+  onAnimationEnd: () => void;
+};
+
 interface MapMedProps {
   country?: string; // ship position (optional in destination picker context)
   selectedCountry?: string; // which country is selected as destination
   disabledCountries?: string[]; // can't pick these
   onSelectCountry?: (country: string) => void; // for clicking countries
   highlightCurrent?: boolean; // highlight the ship/country
+  // Animation
+  animateShip?: AnimateShipProps;
+}
+
+function getCurve(from: {x:number, y:number}, to: {x:number, y:number}) {
+  // Simple quadratic curve, control pt at midpoint pulled toward the sea center
+  const mx = (from.x + to.x) / 2;
+  const my = (from.y + to.y) / 2 - 55; // shifts midpoint up (to sea)
+  return `M ${from.x} ${from.y} Q ${mx} ${my}, ${to.x} ${to.y}`;
 }
 
 const MapMed: React.FC<MapMedProps> = ({
@@ -33,9 +51,67 @@ const MapMed: React.FC<MapMedProps> = ({
   disabledCountries = [],
   onSelectCountry,
   highlightCurrent = true,
+  animateShip,
 }) => {
-  // Position of ship if a country is provided
-  const ship = country ? LOCATIONS[country] : null;
+  // Animate ship state
+  const [animProgress, setAnimProgress] = useState(0); // 0-1
+  const [midFired, setMidFired] = useState(false);
+  const shipAnimRef = useRef<number | null>(null);
+
+  // Start animation when animateShip is set:
+  useEffect(() => {
+    if (!animateShip) {
+      setAnimProgress(0);
+      setMidFired(false);
+      if (shipAnimRef.current) {
+        cancelAnimationFrame(shipAnimRef.current);
+        shipAnimRef.current = null;
+      }
+      return;
+    }
+    setAnimProgress(0);
+    setMidFired(false);
+    let start = performance.now();
+    function draw(now: number) {
+      const elapsed = now - start;
+      let p = Math.min(1, elapsed / animateShip.duration);
+      setAnimProgress(p);
+      // Fire midpoint event if needed
+      if (!midFired && p >= 0.5) {
+        if (animateShip.risk && animateShip.onMidpoint) animateShip.onMidpoint();
+        setMidFired(true);
+      }
+      if (p < 1) {
+        shipAnimRef.current = requestAnimationFrame(draw);
+      } else {
+        if (animateShip.onAnimationEnd) animateShip.onAnimationEnd();
+        shipAnimRef.current = null;
+      }
+    }
+    shipAnimRef.current = requestAnimationFrame(draw);
+    return () => {
+      if (shipAnimRef.current) cancelAnimationFrame(shipAnimRef.current);
+      shipAnimRef.current = null;
+    };
+    // eslint-disable-next-line
+  }, [animateShip?.from, animateShip?.to, animateShip?.duration, animateShip?.risk]);
+
+  // Find anim position
+  let shipAnimPos: {x:number,y:number}|null = null;
+  if (animateShip) {
+    const src = LOCATIONS[animateShip.from];
+    const dest = LOCATIONS[animateShip.to];
+    if (src && dest) {
+      // Interpolate along quadratic
+      const mx = (src.x + dest.x) / 2;
+      const my = (src.y + dest.y) / 2 - 55;
+      // Quadratic Bézier parameterization
+      const t = animProgress;
+      const x = (1 - t) * (1 - t) * src.x + 2 * (1 - t) * t * mx + t * t * dest.x;
+      const y = (1 - t) * (1 - t) * src.y + 2 * (1 - t) * t * my + t * t * dest.y;
+      shipAnimPos = { x, y };
+    }
+  }
 
   return (
     <div className="w-full flex justify-center my-2">
@@ -57,7 +133,7 @@ const MapMed: React.FC<MapMedProps> = ({
           }}
           draggable={false}
         />
-        {/* SVG overlays for interaction */}
+        {/* SVG overlays for interaction & animation */}
         <svg
           width={500}
           height={380}
@@ -72,6 +148,19 @@ const MapMed: React.FC<MapMedProps> = ({
             pointerEvents: "none",
           }}
         >
+          {/* Travel curve for animation */}
+          {animateShip && (
+            <path
+              d={getCurve(LOCATIONS[animateShip.from], LOCATIONS[animateShip.to])}
+              stroke="#2563eb"
+              strokeWidth={3.5}
+              fill="none"
+              strokeDasharray="8 6"
+              opacity={0.7}
+              style={{filter:"drop-shadow(0 0 8px #38bdf855)"}}
+            />
+          )}
+          {/* Country markers */}
           {Object.entries(LOCATIONS).map(([name, { x, y }]) => {
             const isSelected = selectedCountry === name;
             const isDisabled = disabledCountries.includes(name);
@@ -140,17 +229,28 @@ const MapMed: React.FC<MapMedProps> = ({
               </g>
             );
           })}
-
-          {/* Ship marker */}
-          {ship && (
+          {/* Animated ship */}
+          {shipAnimPos ? (
             <g>
-              <circle cx={ship.x} cy={ship.y - 21} r={23} fill="#e9fbf5CC" opacity={0.54} />
-              <foreignObject x={ship.x - 17} y={ship.y - 38} width="34" height="34">
-                <div className="flex justify-center items-center w-full h-full">
-                  <Ship size={28} color="#2662a9" style={{ strokeWidth: 2.5 }} />
+              <circle cx={shipAnimPos.x} cy={shipAnimPos.y - 21} r={23} fill="#e9fbf5CC" opacity={0.54} />
+              <foreignObject x={shipAnimPos.x - 17} y={shipAnimPos.y - 38} width="34" height="34">
+                <div className="flex justify-center items-center w-full h-full animate-pulse">
+                  <Ship size={28} color="#2563eb" style={{ strokeWidth: 2.5 }} />
                 </div>
               </foreignObject>
             </g>
+          ) : (
+            country && LOCATIONS[country] && (
+              // Not animating, static ship at port
+              <g>
+                <circle cx={LOCATIONS[country].x} cy={LOCATIONS[country].y - 21} r={23} fill="#e9fbf5CC" opacity={0.54} />
+                <foreignObject x={LOCATIONS[country].x - 17} y={LOCATIONS[country].y - 38} width="34" height="34">
+                  <div className="flex justify-center items-center w-full h-full">
+                    <Ship size={28} color="#2662a9" style={{ strokeWidth: 2.5 }} />
+                  </div>
+                </foreignObject>
+              </g>
+            )
           )}
         </svg>
       </div>
