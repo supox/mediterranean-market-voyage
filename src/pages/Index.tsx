@@ -161,12 +161,15 @@ const Index = () => {
         balance={balance}
         cargo={cargoForHeader}
       />
-      <DayStartModal
-        open={showDayStartModal}
-        day={justStartedDay || day}
-        weather={newDayWeather}
-        onClose={closeDayStartModal}
-      />
+      {/* Only show DayStartModal if game is NOT over */}
+      {!isGameOver && (
+        <DayStartModal
+          open={showDayStartModal}
+          day={justStartedDay || day}
+          weather={newDayWeather}
+          onClose={closeDayStartModal}
+        />
+      )}
       {/* Removed cargo capacity indicator just below header */}
       {/* <div className="w-full max-w-4xl mx-auto px-4 mt-2 text-right">
         <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold text-sm drop-shadow">
