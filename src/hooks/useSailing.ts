@@ -1,8 +1,6 @@
-
 import { useState } from "react";
 import { getRandomWeather } from "@/utils/gameHelpers";
 import { toast } from "@/hooks/use-toast";
-import { generatePricesForAllCountries } from "@/utils/pricing";
 
 export function useSailing({
   country,
@@ -11,8 +9,8 @@ export function useSailing({
   setWeather,
   advanceTime,
   setSailOpen,
-  afterFinish, // optional callback after journey end (e.g. to reset defend ships)
-  onSailSuccess, // optional callback when sailing completes without event
+  afterFinish,
+  onSailSuccess,
 }: {
   country: string;
   currentHour: number;
@@ -21,9 +19,8 @@ export function useSailing({
   advanceTime: (hours: number) => void;
   setSailOpen: (open: boolean) => void;
   afterFinish?: () => void;
-  onSailSuccess?: (dest: string) => void;
+  onSailSuccess?: (dest: string, hadEvent: boolean) => void;
 }) {
-  // Extend sailing state to include hasEventOccurred
   const [sailing, setSailingState] = useState<null | {
     from: string;
     to: string;
@@ -58,9 +55,9 @@ export function useSailing({
     setSailingPausedState(false);
   }
   function finishSail(dest: string, travelDays: number) {
-    // Check if an event occurred during sailing; if not, trigger success event
-    if (onSailSuccess && sailing && !sailing.hasEventOccurred) {
-      onSailSuccess(dest);
+    // Call onSailSuccess and pass hasEventOccurred to allow filtering toasts
+    if (onSailSuccess && sailing) {
+      onSailSuccess(dest, !!sailing.hasEventOccurred);
     }
     setCountry(dest);
     setWeather(getRandomWeather());

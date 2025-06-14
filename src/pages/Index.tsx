@@ -15,11 +15,13 @@ import { toast } from "@/hooks/use-toast";
 // Main game page, using extracted logic and focused components
 const Index = () => {
   // SAIL SUCCESS TOAST HANDLER
-  function handleSailSuccess(destination: string) {
-    toast({
-      title: "Smooth Sailing!",
-      description: `You sailed to ${destination} with no incidents.`,
-    });
+  function handleSailSuccess(destination: string, hadEvent: boolean) {
+    if (!hadEvent) {
+      toast({
+        title: "Smooth Sailing!",
+        description: `You sailed to ${destination} with no incidents.`,
+      });
+    }
   }
 
   const {
@@ -67,22 +69,35 @@ const Index = () => {
     setDefendShipsModalOpen,
     cargoValue,
     setSailingHasEventOccurred,
-  } = useGameLogic({ onSailSuccess: handleSailSuccess });
+  } = useGameLogic({
+    onSailSuccess: (destination: string, hadEvent: boolean) =>
+      handleSailSuccess(destination, hadEvent),
+  });
 
-  // Intercept sailing: 1. ask about defend ships, then 2. continue to normal sail modal
-  const [pendingSail, setPendingSail] = useState<{open: boolean}>({ open: false });
+  // STATE to store destination before modals and journey starts
+  const [pendingSail, setPendingSail] = useState<{
+    open: boolean;
+    dest?: string;
+    travelTime?: number;
+  }>({ open: false });
 
   function openSailFlow() {
-    // Instead of opening sail modal, open the defend ships modal, then sail modal
+    setPendingSail({ open: true });
+  }
+
+  function handleDestinationSelected(dest: string, travelTime: number) {
+    setPendingSail({ open: true, dest, travelTime });
     setDefendShipsModalOpen(true);
-    setPendingSail({open: true});
   }
 
   function handleConfirmDefendShips(numShips: number, shipPrice: number) {
     setDefendShips(numShips, shipPrice);
     setDefendShipsModalOpen(false);
     setTimeout(() => {
-      setSailOpen(true);
+      if (pendingSail.dest && pendingSail.travelTime !== undefined) {
+        handleSail(pendingSail.dest, pendingSail.travelTime);
+        setPendingSail({ open: false }); // Clear after journey begins
+      }
     }, 200); // show sail modal after closing defend modal
   }
 
@@ -92,18 +107,15 @@ const Index = () => {
   function handleMapMidpoint() {
     if (sailing && sailing.risk && !sailing.hasEventOccurred) {
       triggerEvent(sailing.risk);
-      // Mark as event occurred
       if (setSailingHasEventOccurred) setSailingHasEventOccurred(true);
     }
   }
 
   function onEventSelect(val: string): string | void {
-    // Pass outcome BACK to modal so it shows outcome before closing.
     return handleEventOption(val);
   }
 
   function onEventClose() {
-    // When user clicks OK in modal, this handler closes and resumes
     resumeSailing();
     setEventOpen(false); // closes EventModal
   }
@@ -184,18 +196,18 @@ const Index = () => {
         open={defendShipsModalOpen}
         onClose={() => {
           setDefendShipsModalOpen(false);
-          setPendingSail({open: false});
+          setPendingSail({ open: false });
         }}
         balance={balance}
         cargoValue={cargoValue}
         onConfirm={handleConfirmDefendShips}
       />
       <SailModal
-        open={sailOpen}
-        onClose={() => setSailOpen(false)}
-        onSail={handleSail}
+        open={pendingSail.open && !defendShipsModalOpen}
+        onClose={() => setPendingSail({ open: false })}
         currentCountry={country}
         currentHour={currentHour}
+        onDestinationSelected={handleDestinationSelected}
       />
       <EventModal
         open={eventOpen}

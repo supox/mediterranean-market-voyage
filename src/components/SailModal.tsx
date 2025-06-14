@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Map } from "lucide-react";
 import { useState } from "react";
@@ -20,7 +21,6 @@ const ROUTES: Record<string, Record<string, number>> = {
 };
 
 function formatTravelTime(days: number) {
-  // In this game, 1 day = 12 in-game hours (08:00 to 20:00)
   const hours = Math.round(days * 12);
   return `${hours} hour${hours !== 1 ? "s" : ""}`;
 }
@@ -28,10 +28,11 @@ function formatTravelTime(days: number) {
 interface SailModalProps {
   open: boolean;
   onClose: () => void;
-  onSail: (country: string, time: number) => void;
+  // Remove old onSail, use onDestinationSelected for new flow
+  // onSail: (country: string, time: number) => void;
   currentCountry: string;
-  // To know currentHour, we get it as prop
   currentHour?: number;
+  onDestinationSelected?: (dest: string, travelTime: number) => void;
 }
 
 const DEFAULT_START_HOUR = 8;
@@ -40,9 +41,9 @@ const DEFAULT_END_HOUR = 20;
 const SailModal: React.FC<SailModalProps> = ({
   open,
   onClose,
-  onSail,
   currentCountry,
   currentHour = DEFAULT_START_HOUR,
+  onDestinationSelected,
 }) => {
   const [dest, setDest] = useState<string | null>(null);
 
@@ -70,12 +71,12 @@ const SailModal: React.FC<SailModalProps> = ({
     })
     .map((d) => d.name);
 
-  const handleSail = () => {
-    if (dest && ROUTES[currentCountry][dest] !== 999) {
+  const handlePickDestination = () => {
+    if (dest && ROUTES[currentCountry][dest] !== 999 && onDestinationSelected) {
       const travelTime = ROUTES[currentCountry][dest];
       const travelHours = Math.round(travelTime * 12);
       if (currentHour + travelHours > DEFAULT_END_HOUR) return;
-      onSail(dest, travelTime);
+      onDestinationSelected(dest, travelTime);
       setDest(null);
       onClose();
     }
@@ -126,9 +127,9 @@ const SailModal: React.FC<SailModalProps> = ({
           <button
             className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg mt-2 hover:bg-blue-700 disabled:opacity-70"
             disabled={!dest || disabled.includes(dest)}
-            onClick={handleSail}
+            onClick={handlePickDestination}
           >
-            {dest ? `Sail to ${dest}` : "Select Destination on Map"}
+            {dest ? `Next: Hire Defend Ships` : "Select Destination on Map"}
           </button>
         )}
       </DialogContent>
@@ -137,3 +138,4 @@ const SailModal: React.FC<SailModalProps> = ({
 };
 
 export default SailModal;
+
