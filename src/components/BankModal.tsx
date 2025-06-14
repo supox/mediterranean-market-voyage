@@ -40,6 +40,15 @@ const BankModal: React.FC<BankModalProps> = ({
         <DialogHeader>
           <DialogTitle>Bank</DialogTitle>
         </DialogHeader>
+        {/* Bank image section */}
+        <div className="flex justify-center mb-3">
+          <img
+            src="/lovable-uploads/0508b10a-86f6-456a-b1ca-2ae4fb6d8fb7.png"
+            alt="Medieval Banker Illustration"
+            className="w-32 h-32 object-contain rounded-md shadow"
+            style={{ background: "#e7dbb2" }}
+          />
+        </div>
         <div className="flex gap-3 mb-3 mt-2">
           <button
             onClick={() => setActiveTab("deposit")}
@@ -80,3 +89,4 @@ const BankModal: React.FC<BankModalProps> = ({
 };
 
 export default BankModal;
+
