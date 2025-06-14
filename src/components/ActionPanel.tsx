@@ -1,4 +1,3 @@
-
 import { Banknote, Ship, Store, Clock } from "lucide-react";
 
 interface ActionPanelProps {
@@ -12,6 +11,7 @@ interface ActionPanelProps {
 
 const countryImages: { [key: string]: string } = {
   Turkey: "/lovable-uploads/b04ca857-7db0-4cc0-b5f5-5a56f7541f3a.png",
+  Israel: "/lovable-uploads/5fc74a15-7429-49de-92cf-168edb5edf56.png",
 };
 
 const ActionPanel: React.FC<ActionPanelProps> = ({
