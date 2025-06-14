@@ -105,13 +105,14 @@ const Index = () => {
   function handleConfirmDefendShips(numShips: number, shipPrice: number) {
     setDefendShips(numShips, shipPrice);
     setDefendShipsModalOpen(false);
-    setTimeout(() => {
-      const { dest, travelTime } = pendingSailRef.current;
-      if (dest && travelTime !== undefined) {
-        handleSail(dest, travelTime);
-        updatePendingSail({ open: false });
-      }
-    }, 200); // show sail modal after closing defend modal
+    
+    // Get the current pending sail info
+    const { dest, travelTime } = pendingSailRef.current;
+    if (dest && travelTime !== undefined) {
+      // Start sailing immediately without setTimeout
+      handleSail(dest, travelTime);
+      updatePendingSail({ open: false });
+    }
   }
 
   // For pirate and all events: 
