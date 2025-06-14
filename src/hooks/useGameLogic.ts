@@ -16,6 +16,7 @@ import { useSailing } from "./useSailing";
 import { useCargoExpansion } from "./useCargoExpansion";
 import { useEventHandlers } from "./useEventHandlers";
 import { useDefendShips } from "./useDefendShips";
+import { useMarketTrade } from "./useMarketTrade";
 
 // Main game logic hook refactored!
 export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent: boolean) => void }) {
@@ -102,30 +103,15 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     balance,
   });
 
-  // Market trade logic - removed ship capacity check here, can exceed capacity
-  function handleMarketTrade(type: string, quantity: number, isBuy: boolean) {
-    const price = pricesByCountry[country][type as keyof typeof pricesByCountry[typeof country]];
-    if (isBuy) {
-      setBalance((b) => b - price * quantity);
-      setCargo((prev) => {
-        const found = prev.find((g) => g.type === type);
-        if (found) {
-          return prev.map((g) => g.type === type ? { ...g, amount: g.amount + quantity } : g);
-        } else {
-          return [...prev, { type, amount: quantity }];
-        }
-      });
-      toast({ title: "Trade Complete", description: `Bought ${quantity} ${type}` });
-    } else {
-      setBalance((b) => b + price * quantity);
-      setCargo((prev) =>
-        prev.map((g) =>
-          g.type === type ? { ...g, amount: Math.max(0, g.amount - quantity) } : g
-        )
-      );
-      toast({ title: "Trade Complete", description: `Sold ${quantity} ${type}` });
-    }
-  }
+  // --- MARKET TRADE (moved to its own hook) ---
+  const { handleMarketTrade } = useMarketTrade({
+    cargo,
+    setCargo,
+    balance,
+    setBalance,
+    pricesByCountry,
+    country
+  });
 
   function handleBankAction(type: "deposit" | "withdraw", amount: number) {
     if (type === "deposit") {
