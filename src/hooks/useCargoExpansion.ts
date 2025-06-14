@@ -16,10 +16,17 @@ export function useCargoExpansion({ balance, shipCapacity, setShipCapacity }: {
   function maybeShowCargoExpansion(newDay: number) {
     if (newDay > 1 && offerDay !== newDay) {
       setOfferDay(newDay);
+      // User must have at least 6000 NIS for the offer to show
+      if (balance < 6000) {
+        return;
+      }
       // 20% chance
       if (Math.random() < 0.2) {
         const minPrice = 5000;
-        const calcPrice = Math.floor(Math.max(minPrice, balance * 0.3));
+        // Price is 30% of balance, but capped at 90% of balance and not less than minPrice
+        const proposedPrice = Math.floor(Math.max(minPrice, balance * 0.3));
+        const maxAllowedPrice = Math.floor(balance * 0.9);
+        const calcPrice = Math.min(proposedPrice, maxAllowedPrice);
         const newCapacity = shipCapacity * 2;
         setCargoExpansionOffer({ price: calcPrice, newCapacity });
         setCargoExpansionModalOpen(true);
@@ -49,3 +56,4 @@ export function useCargoExpansion({ balance, shipCapacity, setShipCapacity }: {
     declineCargoExpansion,
   };
 }
+
