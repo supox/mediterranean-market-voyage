@@ -168,7 +168,12 @@ export function useGameLogic() {
     let desc = "";
     if (val === "escape") desc = "You attempt to flee... and narrowly evade capture!";
     if (val === "negotiate") desc = "A payment is made — the pirates let you go with most of your cargo.";
-    if (val === "fight") desc = "Battle ensues! You win, and plunder some coin from the pirates.";
+    if (val === "fight") {
+      // Calculate plundered coin amount (randomized for engagement)
+      const plunder = Math.floor(300 + Math.random() * 401); // 300~700 coins
+      setBalance((b) => b + plunder);
+      desc = `Battle ensues! You win, and plunder ${plunder} coins from the pirates.`;
+    }
     toast({ title: "Event Outcome", description: desc });
 
     // If currently sailing, finish sail after event
