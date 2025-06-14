@@ -20,9 +20,9 @@ const ROUTES: Record<string, Record<string, number>> = {
 };
 
 function formatTravelTime(days: number) {
-  if (days >= 1) return `${days} day${days > 1 ? "s" : ""}`;
-  if (days * 24 < 1) return `${Math.round(days * 24 * 60)} min`;
-  return `${Math.round(days * 24)} hours`;
+  // In this game, 1 day = 12 in-game hours (08:00 to 20:00)
+  const hours = Math.round(days * 12);
+  return `${hours} hour${hours !== 1 ? "s" : ""}`;
 }
 
 interface SailModalProps {
