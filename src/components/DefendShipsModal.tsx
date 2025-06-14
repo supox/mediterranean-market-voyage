@@ -20,9 +20,10 @@ const DefendShipsModal: React.FC<DefendShipsModalProps> = ({
   cargoValue,
   onConfirm,
 }) => {
-  // Calculate dynamic price as before
+  // Lower price per ship so that buying 5 ships is easier.
   const totalValue = balance + cargoValue;
-  const pricePerShip = Math.max(300, Math.min(Math.round(totalValue * 0.08), 4000));
+  // Minimum 50 ₪, maximum 500 ₪, base is 3% of total value.
+  const pricePerShip = Math.max(50, Math.min(Math.round(totalValue * 0.03), 500));
   const [selected, setSelected] = useState(0);
   const maxShips = Math.min(5, Math.floor(balance / pricePerShip));
 
@@ -85,3 +86,4 @@ const DefendShipsModal: React.FC<DefendShipsModalProps> = ({
 };
 
 export default DefendShipsModal;
+
