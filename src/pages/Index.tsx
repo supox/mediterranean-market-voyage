@@ -1,3 +1,4 @@
+
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -14,7 +15,7 @@ const Index = () => {
   const {
     // Game state
     day,
-    timeOfDay,
+    formattedTime, // changed from timeOfDay
     country,
     weather,
     balance,
@@ -53,7 +54,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-yellow-50 w-full">
       <GameHeader
         day={Math.min(day, 7)}
-        timeOfDay={timeOfDay}
+        timeOfDay={formattedTime} // changed from timeOfDay to formattedTime
         country={country}
         weather={weather}
         balance={balance}
