@@ -139,6 +139,7 @@ const Index = () => {
                 onSail={handleSailButtonClick}
                 onRest={handleRest}
                 disabled={isGameOver}
+                country={country}
               />
             )}
             {sailing && (
