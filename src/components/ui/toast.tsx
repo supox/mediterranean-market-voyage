@@ -5,7 +5,11 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const ToastProvider = ToastPrimitives.Provider
+const ToastProvider = (props: React.ComponentProps<typeof ToastPrimitives.Provider>) => (
+  <ToastPrimitives.Provider {...props}>
+    <div dir="rtl">{props.children}</div>
+  </ToastPrimitives.Provider>
+)
 
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
@@ -47,6 +51,7 @@ const Toast = React.forwardRef<
     <ToastPrimitives.Root
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
+      dir="rtl"
       {...props}
     />
   )

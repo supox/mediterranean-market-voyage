@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Ship, Flag, MessageSquare, Coins } from "lucide-react";
@@ -76,7 +77,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md flex flex-col items-center">
+      <DialogContent className="max-w-md flex flex-col items-center" dir="rtl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 justify-center w-full">
             {isPirate ? (
@@ -167,3 +168,4 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
+
