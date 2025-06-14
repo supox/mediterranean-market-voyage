@@ -1,6 +1,8 @@
 
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Ship, Flag, MessageSquare, Coins } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface EventModalProps {
   open: boolean;
@@ -8,7 +10,7 @@ interface EventModalProps {
   description: string;
   options?: { label: string; value: string }[];
   onClose: () => void;
-  onSelectOption?: (val: string) => void;
+  onSelectOption?: (val: string) => string | void; // now returns string outcome if present
 }
 
 // Icon fallback map
@@ -29,12 +31,38 @@ const EventModal: React.FC<EventModalProps> = ({
   onClose,
   onSelectOption,
 }) => {
+  const [outcome, setOutcome] = useState<string | null>(null);
+
+  // Reset outcome when modal reopens
+  useEffect(() => {
+    if (!open) setOutcome(null);
+  }, [open]);
+
+  function handleOption(val: string) {
+    // If onSelectOption returns a string, treat as outcome
+    let result: string | void = undefined;
+    if (onSelectOption) {
+      result = onSelectOption(val);
+    }
+    if (typeof result === "string" && result.length > 0) {
+      setOutcome(result);
+    } else {
+      // Fallback to generic message if no feedback
+      setOutcome("Action complete.");
+    }
+  }
+
+  function handleOk() {
+    setOutcome(null);
+    onClose();
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md flex flex-col items-center">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {ICONS[type] || <Flag size={28} />} {type} Event
+          <DialogTitle className="flex items-center gap-2 justify-center w-full">
+            {ICONS[type] || <Flag size={28} />} {type ? type + " Event" : "Event"}
           </DialogTitle>
         </DialogHeader>
         {/* Show the pirate image if this is a pirate event */}
@@ -47,22 +75,33 @@ const EventModal: React.FC<EventModalProps> = ({
             draggable={false}
           />
         )}
-        <div className="my-2 text-base">{description}</div>
-        {options && (
-          <div className="flex flex-col gap-2 mt-3">
-            {options.map(opt => (
-              <button
-                key={opt.value}
-                className="px-4 py-2 bg-blue-100 border border-blue-400 rounded-lg hover:bg-blue-200 font-bold"
-                onClick={() => {
-                  if (onSelectOption) onSelectOption(opt.value);
-                  onClose();
-                }}
-              >
-                {opt.label}
-              </button>
-            ))}
+        {/* Show outcome if present, otherwise show the prompt/options */}
+        {outcome ? (
+          <div className="flex flex-col items-center justify-center w-full py-7">
+            <div className="text-lg font-semibold text-center mb-6">{outcome}</div>
+            <Button className="mt-2 w-32" onClick={handleOk}>
+              OK
+            </Button>
           </div>
+        ) : (
+          <>
+            {/* Modal query text */}
+            <div className="my-2 text-base text-center w-full">{description}</div>
+            {options && (
+              <div className="flex flex-col gap-2 mt-4 w-full items-center">
+                {options.map(opt => (
+                  <Button
+                    key={opt.value}
+                    className="w-40"
+                    variant="outline"
+                    onClick={() => handleOption(opt.value)}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </DialogContent>
     </Dialog>
@@ -70,3 +109,4 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
+
