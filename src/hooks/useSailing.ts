@@ -10,9 +10,9 @@ export function useSailing({
   setCountry,
   setWeather,
   advanceTime,
-  setSailOpen, // Only keep what is actually used!
+  setSailOpen,
+  afterFinish, // optional callback after journey end (e.g. to reset defend ships)
 }) {
-  // Add ship animation state
   const [sailing, setSailingState] = useState<null | {
     from: string;
     to: string;
@@ -45,6 +45,7 @@ export function useSailing({
     advanceTime(Math.round(travelDays * 12));
     setSailingState(null);
     setSailingPausedState(false);
+    if (afterFinish) afterFinish();
   }
 
   return {
@@ -54,7 +55,5 @@ export function useSailing({
     pauseSailing,
     resumeSailing,
     finishSail,
-    // Do not proxy setSailing or setSailingPaused—they are internal only.
   };
 }
-

@@ -70,25 +70,41 @@ export function useGameLogic() {
   // }>(null);
   // const [sailingPaused, setSailingPaused] = useState(false);
 
-  // Only advances the day if "rest" is called
-  function advanceTime(hours: number | "rest") {
-    if (hours === "rest") {
-      setDay((d) => d + 1);
-      setCurrentHour(DAY_START_HOUR);
-      setWeather(getRandomWeather());
-      setPricesByCountry(generatePricesForAllCountries(["Israel", "Turkey", "Greece", "Cyprus", "Egypt"])); // <-- Regenerate all prices!
-      toast({ description: "A new day dawns over the Mediterranean." });
-      return;
-    }
-    let newHour = currentHour + hours;
-    if (newHour > DAY_END_HOUR) {
-      // Cap hour to 20:00 if trying to exceed it—no day increment
-      setCurrentHour(DAY_END_HOUR);
-    } else {
-      setCurrentHour(newHour);
-    }
-    // Day only increases on rest now
+  // Add defend ships per journey state:
+  const [defendShips, setDefendShipsState] = useState(0);
+  const [defendShipsModalOpen, setDefendShipsModalOpen] = useState(false);
+  const [defendShipCost, setDefendShipCost] = useState(0);
+
+  // SCORE utility: cargo value computation
+  const cargoValue = cargo.reduce((acc, cur) => {
+    const price = pricesByCountry[country]?.[cur.type] || 0;
+    return acc + ((cur.amount || 0) * price);
+  }, 0);
+
+  // When player confirms defend ships rental before sailing:
+  function setDefendShips(num: number, pricePerShip: number) {
+    setDefendShipsState(num);
+    setDefendShipCost(pricePerShip);
+    // Charge upfront
+    setBalance((bal) => bal - (num * pricePerShip));
   }
+
+  // When sailing finishes or new journey: reset defend ship count
+  function clearDefendShips() {
+    setDefendShipsState(0);
+    setDefendShipCost(0);
+  }
+
+  // Use sailing logic, and clear defend ships when journey ends
+  const sailingLogic = useSailing({
+    country,
+    currentHour,
+    setCountry,
+    setWeather,
+    advanceTime,
+    setSailOpen,
+    afterFinish: clearDefendShips, // callback after sailing ends
+  });
 
   // Actions
   function handleMarketTrade(type: string, quantity: number, isBuy: boolean) {
@@ -164,16 +180,6 @@ export function useGameLogic() {
   //   setSailingPaused(false);
   // }
 
-  // Use sailing logic
-  const sailingLogic = useSailing({
-    country,
-    currentHour,
-    setCountry,
-    setWeather,
-    advanceTime,
-    setSailOpen,
-  });
-
   // Called when event occurs during sailing
   function triggerEvent(risk: string) {
     let desc = "";
@@ -199,17 +205,43 @@ export function useGameLogic() {
   // Return only the outcome string; do not toast here!
   function handleEventOption(val: string) {
     let desc = "";
-    if (val === "escape") desc = "You attempt to flee... and narrowly evade capture!";
-    if (val === "negotiate") desc = "A payment is made — the pirates let you go with most of your cargo.";
-    if (val === "fight") {
-      // Calculate plundered coin amount (randomized for engagement)
-      const plunder = Math.floor(300 + Math.random() * 401); // 300~700 coins
-      setBalance((b) => b + plunder);
-      desc = `Battle ensues! You win, and plunder ${plunder} coins from the pirates.`;
+    if (val === "escape") {
+      // Each defend ship slightly increases escape success chance
+      const chance = 0.45 + defendShips * 0.07;
+      if (Math.random() < chance) {
+        desc = "You escape using clever maneuvers and your hired escorts!";
+      } else {
+        desc = "Despite your best efforts, pirates catch up. Brace for battle!";
+      }
     }
-    // Do NOT show toast here!
-
-    // Only return the desc for EventModal
+    if (val === "negotiate") {
+      // Each defend ship reduces the pirates' leverage, possibly lowering loss
+      const lostGoods = Math.max(1, 3 - defendShips);
+      desc = `You accept paying tribute, losing ${lostGoods} cargo units. The pirates let you go.`;
+      // Remove goods
+      setCargo((prev) => {
+        let toRemove = lostGoods;
+        return prev.map(good =>
+          toRemove > 0 && good.amount > 0
+            ? { ...good, amount: Math.max(0, good.amount - (toRemove-- > 0 ? 1 : 0)) }
+            : good
+        );
+      });
+    }
+    if (val === "fight") {
+      // Chance/reward scales by defend ships
+      const winChance = 0.18 + defendShips * 0.16; // 18% base, each ship +16%
+      if (Math.random() < winChance) {
+        const base = 350;
+        const extra = defendShips * 250;
+        const plunder = base + Math.floor(Math.random() * 400) + extra;
+        setBalance((b) => b + plunder);
+        desc = `Battle ensues! Your fleet prevails, and you win, plundering ${plunder} coins from the pirates.`;
+      } else {
+        desc = "Despite your courage, the pirates overpower you. You lose some cargo.";
+        setCargo((prev) => prev.map(g => ({ ...g, amount: Math.max(0, g.amount - 1) })));
+      }
+    }
     return desc;
   }
 
@@ -298,7 +330,14 @@ export function useGameLogic() {
     sailingPaused: sailingLogic.sailingPaused, // <--------- NEW
     pauseSailing: sailingLogic.pauseSailing,
     resumeSailing: sailingLogic.resumeSailing,
+
+    // Defend ships modal controls
+    defendShipsModalOpen,
+    setDefendShipsModalOpen,
+    setDefendShips,
+    defendShips,
+    cargoValue,
   };
 }
 
-// NOTE: This file is now over 240 lines and should be refactored soon!
+// NOTE: This file is now over 300 lines and should be refactored soon!

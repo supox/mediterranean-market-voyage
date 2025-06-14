@@ -7,7 +7,9 @@ import EventModal from "@/components/EventModal";
 import GameOver from "@/components/GameOver";
 import PricesTable from "@/components/PricesTable";
 import MapMed from "@/components/MapMed";
+import DefendShipsModal from "@/components/DefendShipsModal";
 import { useGameLogic } from "@/hooks/useGameLogic";
+import React, { useState } from "react";
 
 // Main game page, using extracted logic and focused components
 const Index = () => {
@@ -40,12 +42,12 @@ const Index = () => {
     // Actions
     handleMarketTrade,
     handleBankAction,
-    handleSail, // now triggers animation
+    handleSail,
     handleEventOption,
     handleRest,
     resetGame,
-    finishSail, // called when animation ends or after event
-    triggerEvent, // called at midpoint if risk exists
+    finishSail,
+    triggerEvent,
     sailing,
     sailingPaused,
     resumeSailing,
@@ -54,7 +56,28 @@ const Index = () => {
     isGameOver,
     maxDeposit,
     maxWithdraw,
+    setDefendShips,
+    defendShipsModalOpen,
+    setDefendShipsModalOpen,
+    cargoValue,
   } = useGameLogic();
+
+  // Intercept sailing: 1. ask about defend ships, then 2. continue to normal sail modal
+  const [pendingSail, setPendingSail] = useState<{open: boolean}>({ open: false });
+
+  function openSailFlow() {
+    // Instead of opening sail modal, open the defend ships modal, then sail modal
+    setDefendShipsModalOpen(true);
+    setPendingSail({open: true});
+  }
+
+  function handleConfirmDefendShips(numShips: number, shipPrice: number) {
+    setDefendShips(numShips, shipPrice);
+    setDefendShipsModalOpen(false);
+    setTimeout(() => {
+      setSailOpen(true);
+    }, 200); // show sail modal after closing defend modal
+  }
 
   // For pirate and all events: 
   // onSelect returns outcome, modal shows it, 
@@ -94,7 +117,7 @@ const Index = () => {
               <ActionPanel
                 onMarket={() => setMarketOpen(true)}
                 onBank={() => setBankOpen(true)}
-                onSail={() => setSailOpen(true)}
+                onSail={openSailFlow}
                 onRest={handleRest}
                 disabled={isGameOver}
               />
@@ -146,6 +169,16 @@ const Index = () => {
         onBankAction={handleBankAction}
         maxDeposit={maxDeposit}
         maxWithdraw={maxWithdraw}
+      />
+      <DefendShipsModal
+        open={defendShipsModalOpen}
+        onClose={() => {
+          setDefendShipsModalOpen(false);
+          setPendingSail({open: false});
+        }}
+        balance={balance}
+        cargoValue={cargoValue}
+        onConfirm={handleConfirmDefendShips}
       />
       <SailModal
         open={sailOpen}
