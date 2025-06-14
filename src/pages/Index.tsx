@@ -1,3 +1,4 @@
+
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -61,7 +62,6 @@ const Index = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow">
           🌊 Merchant of the Mediterranean
         </h1>
-        <PricesTable />
         {isGameOver ? (
           <GameOver balance={balance} cargo={cargo} onPlayAgain={resetGame} />
         ) : (
@@ -73,20 +73,11 @@ const Index = () => {
               onRest={handleRest}
               disabled={isGameOver}
             />
-            <div className="mt-14 w-full max-w-lg">
-              <div className="bg-white/80 border border-slate-200 rounded-xl shadow px-6 py-5 text-base md:text-lg text-blue-900 animate-fade-in">
-                <div className="mb-2 font-semibold">Tip:</div>
-                <div>
-                  Use the market to buy low, sell high. Sail between countries — but beware: events become riskier in the evening!
-                </div>
-                <div className="mt-2 text-xs text-muted-foreground">
-                  Travel, trade, and survive — how much gold can you accumulate in just 7 days?
-                </div>
-              </div>
-            </div>
+            {/* Removed the Tip section here */}
           </>
         )}
       </div>
+      <PricesTable />
       <MarketModal
         open={marketOpen}
         onClose={() => setMarketOpen(false)}
@@ -120,3 +111,4 @@ const Index = () => {
 };
 
 export default Index;
+
