@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +51,15 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
         <DialogHeader>
           <DialogTitle>{isBuy ? "Buy" : "Sell"} Goods</DialogTitle>
         </DialogHeader>
+        {/* Image for Market popup */}
+        <div className="flex justify-center mb-3">
+          <img
+            src="/lovable-uploads/65af5864-7834-4eda-8f8c-a0f7e4772f3d.png"
+            alt="Marketplace Illustration"
+            className="w-32 h-32 object-contain rounded-md shadow"
+            style={{ background: "#f2e6c9" }}
+          />
+        </div>
         <div className="flex gap-3 items-center mt-1 mb-2">
           {GOODS.map(g => (
             <button
