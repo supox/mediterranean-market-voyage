@@ -104,7 +104,7 @@ export function useEventHandlers({
     gainAmount = Math.min(gainAmount, availableSpace);
 
     if (gainAmount <= 0) {
-      const description = "מצאת אוניות נטושות, אך לאחר חיפוש יסודי לא מצאתה מטען משמעותי להוסיף.";
+      const description = "מצאת אוניות נטושות, אך לאחר חיפוש יסודי לא מצאת מטען משמעותי להוסיף.";
       setEventData({ type: "Deserted Ships", description, options: [] });
       setEventOpen(true);
       sailingLogic.pauseSailing();
