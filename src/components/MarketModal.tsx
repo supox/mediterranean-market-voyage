@@ -28,9 +28,10 @@ interface MarketModalProps {
 
 const countryImages: { [key: string]: string } = {
   Turkey: "/lovable-uploads/b04ca857-7db0-4cc0-b5f5-5a56f7541f3a.png",
-  Israel: "/lovable-uploads/bb13a525-8f06-4c12-92fb-2a415ea252d7.png", // Israel image
+  Israel: "/lovable-uploads/bb13a525-8f06-4c12-92fb-2a415ea252d7.png",
   Egypt: "/lovable-uploads/23ac5e36-2a0e-4ee3-9659-01a0cbe024f9.png",
-  Cyprus: "/lovable-uploads/781a783b-a9f8-4000-8e62-da2386ccc29d.png", // <-- Added Cyprus image
+  Cyprus: "/lovable-uploads/781a783b-a9f8-4000-8e62-da2386ccc29d.png",
+  Greece: "/lovable-uploads/32d9486a-456f-47f3-aaa7-2926ac272e2b.png", // <-- New Greek market image
   // Add more here as you upload for other countries
 };
 
