@@ -1,7 +1,7 @@
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Map } from "lucide-react";
 import { useState } from "react";
+import MapMed from "./MapMed";
 
 const DESTS = [
   { name: "Turkey", flag: "🇹🇷" },
@@ -40,48 +40,65 @@ const SailModal: React.FC<SailModalProps> = ({
 }) => {
   const [dest, setDest] = useState<string | null>(null);
 
-  const destinations = DESTS.filter(d => d.name !== currentCountry);
+  // Countries you can travel to (not current, not 999)
+  const destinations = DESTS.filter(
+    (d) => d.name !== currentCountry && ROUTES[currentCountry][d.name] !== 999
+  );
+  // Countries you can't reach
+  const disabled = DESTS
+    .filter(
+      (d) =>
+        d.name === currentCountry ||
+        ROUTES[currentCountry][d.name] === 999
+    )
+    .map((d) => d.name);
 
   const handleSail = () => {
-    if (dest) {
+    if (dest && ROUTES[currentCountry][dest] !== 999) {
       const travelTime = ROUTES[currentCountry][dest];
-      if (travelTime !== 999) {
-        onSail(dest, travelTime);
-        setDest(null);
-        onClose();
-      }
+      onSail(dest, travelTime);
+      setDest(null);
+      onClose();
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm sm:max-w-md">
+      <DialogContent className="max-w-xl sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Sail to...</DialogTitle>
+          <DialogTitle>
+            <span className="inline-flex items-center gap-2">
+              <Map size={20} /> Choose Your Destination
+            </span>
+          </DialogTitle>
+          <DialogDescription>
+            Click a reachable port on the map. Unavailable destinations are greyed out.
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-3 mt-2 mb-3">
-          {destinations.map(d => (
-            <button
-              key={d.name}
-              onClick={() => setDest(d.name)}
-              className={`flex items-center p-3 bg-white rounded-lg border ${dest === d.name ? "border-blue-600 ring-2 ring-blue-200" : "border-gray-100"} hover:bg-blue-50 focus:outline-none transition`}
-            >
-              <span className="text-2xl mr-2">{d.flag}</span>
-              <span className="font-semibold text-base">{d.name}</span>
-              <span className="ml-auto text-xs opacity-70">
-                {ROUTES[currentCountry][d.name] === 999
-                  ? "N/A"
-                  : formatTravelTime(ROUTES[currentCountry][d.name])}
-              </span>
-            </button>
-          ))}
+        <div>
+          <MapMed
+            country={currentCountry}
+            selectedCountry={dest || undefined}
+            disabledCountries={disabled}
+            onSelectCountry={(name) => {
+              if (!disabled.includes(name)) setDest(name);
+            }}
+            highlightCurrent={false}
+          />
         </div>
+        {dest && (
+          <div className="flex justify-center mb-2">
+            <span className="rounded px-3 py-1 bg-blue-50 border text-blue-900 border-blue-200 font-semibold text-sm">
+              {dest} — {formatTravelTime(ROUTES[currentCountry][dest])}
+            </span>
+          </div>
+        )}
         <button
           className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg mt-2 hover:bg-blue-700 disabled:opacity-70"
-          disabled={!dest || ROUTES[currentCountry][dest] === 999}
+          disabled={!dest || ROUTES[currentCountry][dest!] === 999}
           onClick={handleSail}
         >
-          {dest ? `Sail to ${dest}` : "Select Destination"}
+          {dest ? `Sail to ${dest}` : "Select Destination on Map"}
         </button>
       </DialogContent>
     </Dialog>

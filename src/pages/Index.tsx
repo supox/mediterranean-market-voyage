@@ -73,11 +73,9 @@ const Index = () => {
               onRest={handleRest}
               disabled={isGameOver}
             />
-            {/* Removed the Tip section here */}
+            {/* The ship map for destination picking is now inside the Sail modal */}
           </>
         )}
-        {/* Map of Mediterranean with ship at current location */}
-        <MapMed country={country} />
       </div>
       <PricesTable />
       <MarketModal
