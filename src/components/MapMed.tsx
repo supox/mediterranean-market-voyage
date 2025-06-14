@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { LOCATIONS, FLAG, getCurve } from "@/utils/mapConfig";
 import MapShip from "./MapShip";
@@ -165,12 +164,11 @@ const MapMed = (props: any) => {
       <div
         className="
           relative rounded-xl shadow-lg border bg-cyan-900
-          w-full max-w-[500px] aspect-[500/380] overflow-hidden
-          sm:h-56
+          w-full max-w-md sm:max-w-lg md:max-w-2xl aspect-[4/3] overflow-hidden
         "
         style={{
-          maxWidth: 500,
-          aspectRatio: "500/380",
+          maxWidth: '600px',
+          aspectRatio: "4/3",
         }}
       >
         <img
