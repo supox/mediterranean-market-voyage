@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { generatePricesForAllCountries } from "@/utils/pricing";
@@ -287,7 +286,7 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
         if (totalCargo === 0) {
           const coinLoss = 200 + Math.floor(Math.random() * 300); // 200-500 coins
           setBalance(b => Math.max(0, b - coinLoss));
-          desc += ` You pay ${coinLoss} coins to the pirates.`;
+          desc += ` You pay ${coinLoss} ₪ to the pirates.`;
         }
       }
     }
@@ -297,7 +296,7 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
         // No cargo to give, pay coins instead
         const coinLoss = 150 + Math.floor(Math.random() * 200); // 150-350 coins
         setBalance(b => Math.max(0, b - coinLoss));
-        desc = `You have no cargo to offer, so you pay ${coinLoss} coins as tribute. The pirates let you go.`;
+        desc = `You have no cargo to offer, so you pay ${coinLoss} ₪ as tribute. The pirates let you go.`;
       } else {
         // Each defend ship reduces the pirates' leverage, possibly lowering loss
         const lostGoods = Math.max(1, 3 - defendShips);
@@ -321,17 +320,32 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
         const extra = defendShips * 250;
         const plunder = base + Math.floor(Math.random() * 400) + extra;
         setBalance((b) => b + plunder);
-        desc = `Battle ensues! Your fleet prevails, and you win, plundering ${plunder} coins from the pirates.`;
+        desc = `Battle ensues! Your fleet prevails, and you win, plundering ${plunder} ₪ from the pirates.`;
       } else {
-        desc = "Despite your courage, the pirates overpower you. You lose some cargo.";
         const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
         if (totalCargo === 0) {
           // No cargo to lose, pay coins instead
           const coinLoss = 100 + Math.floor(Math.random() * 200); // 100-300 coins
           setBalance(b => Math.max(0, b - coinLoss));
-          desc += ` With no cargo to take, they demand ${coinLoss} coins.`;
+          desc = `Despite your courage, the pirates overpower you. With no cargo to take, they demand ${coinLoss} ₪.`;
         } else {
-          setCargo((prev) => prev.map(g => ({ ...g, amount: Math.max(0, g.amount - 1) })));
+          // Calculate specific cargo loss before updating state
+          let cargoLost: Array<{ type: string; amount: number }> = [];
+          const updatedCargo = cargo.map(good => {
+            if (good.amount > 0) {
+              const lostAmount = 1; // Lose 1 unit from each type that has cargo
+              cargoLost.push({ type: good.type, amount: lostAmount });
+              return { ...good, amount: Math.max(0, good.amount - lostAmount) };
+            }
+            return good;
+          });
+          
+          // Update cargo state
+          setCargo(updatedCargo);
+          
+          // Create description of what was lost
+          const lostItems = cargoLost.map(item => `${item.amount} tons of ${item.type}`).join(", ");
+          desc = `Despite your courage, the pirates overpower you. You lose ${lostItems}.`;
         }
       }
     }
