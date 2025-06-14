@@ -11,14 +11,15 @@ interface EventModalProps {
   onSelectOption?: (val: string) => void;
 }
 
-// This is a stub for now (only pirates)
-// Expand with more event logic for future versions!
+// Icon fallback map
 const ICONS: Record<string, JSX.Element> = {
   Pirate: <Flag size={32} className="text-red-600" />,
   Navigation: <Ship size={32} className="text-sky-600" />,
   Storm: <MessageSquare size={32} className="text-blue-400" />,
   Treasure: <Coins size={32} className="text-amber-500" />,
 };
+
+const PIRATE_IMAGE_SRC = "/lovable-uploads/c79ea32b-8d77-4a6d-8804-990b2720a110.png";
 
 const EventModal: React.FC<EventModalProps> = ({
   open,
@@ -36,6 +37,16 @@ const EventModal: React.FC<EventModalProps> = ({
             {ICONS[type] || <Flag size={28} />} {type} Event
           </DialogTitle>
         </DialogHeader>
+        {/* Show the pirate image if this is a pirate event */}
+        {type === "Pirate" && (
+          <img
+            src={PIRATE_IMAGE_SRC}
+            alt="Pirate encounter"
+            className="w-full rounded-lg shadow mb-3 border border-amber-600"
+            style={{ maxHeight: 180, objectFit: "cover" }}
+            draggable={false}
+          />
+        )}
         <div className="my-2 text-base">{description}</div>
         {options && (
           <div className="flex flex-col gap-2 mt-3">
