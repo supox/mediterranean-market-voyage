@@ -85,8 +85,9 @@ export function useEventHandlers({
     }
 
     const cargoTypes = ["Wheat", "Olives", "Copper"];
-    const randomType = cargoTypes[Math.floor(Math.random() * cargoTypes.length)] as keyof typeof pricesByCountry[typeof country];
-    const price = pricesByCountry[destination]?.[randomType];
+    const randomType = cargoTypes[Math.floor(Math.random() * cargoTypes.length)];
+    // The next line: ensure randomType is string when accessing pricesByCountry
+    const price = pricesByCountry[destination]?.[String(randomType)];
 
     if (!price || price <= 0) {
       console.error(`Price for ${randomType} in ${destination} not found or is zero.`);

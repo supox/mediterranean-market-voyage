@@ -38,9 +38,8 @@ const MapMed = (props: any) => {
   const [animProgress, setAnimProgress] = useState(0);
   const [midFired, setMidFired] = useState(false);
   const shipAnimRef = useRef<number | null>(null);
-  const lastElapsedRef = useRef(0);
   const lastStartTimeRef = useRef<number | null>(null);
-  const lastFromToRef = useRef<{ from?: string; to?: string; duration?: number }>({});
+  const savedElapsedRef = useRef(0);
 
   // Destructure for both modes
   const {
@@ -56,9 +55,8 @@ const MapMed = (props: any) => {
     if (!animateShip) {
       setAnimProgress(0);
       setMidFired(false);
-      lastElapsedRef.current = 0;
+      savedElapsedRef.current = 0;
       lastStartTimeRef.current = null;
-      lastFromToRef.current = {};
       if (shipAnimRef.current) {
         cancelAnimationFrame(shipAnimRef.current);
         shipAnimRef.current = null;
@@ -66,64 +64,79 @@ const MapMed = (props: any) => {
       return;
     }
 
-    // Only reset animation progress if from/to/duration actually change (NOT when just pausing/resuming!)
-    const newKey = {
-      from: animateShip.from,
-      to: animateShip.to,
-      duration: animateShip.duration,
-    };
-
-    const prevKey = lastFromToRef.current;
-    const isNewSailing =
-      prevKey.from !== newKey.from ||
-      prevKey.to !== newKey.to ||
-      prevKey.duration !== newKey.duration;
-
-    if (isNewSailing) {
-      setAnimProgress(0);
-      setMidFired(false);
-      lastElapsedRef.current = 0;
-      lastStartTimeRef.current = null;
-      lastFromToRef.current = newKey;
-    }
-
     let raf: number;
     let cancelled = false;
 
-    // Use the current progress if resuming (i.e., paused), or 0 if a new journey
-    const startFrom = isNewSailing ? 0 : animProgress || 0;
+    // If just resuming, we want to start from current animProgress and pause state
+    let startFrom = animProgress;
     let elapsedBeforePause = startFrom * animateShip.duration;
-    let localMidFired = midFired;
+    if (!animateShip.paused && !lastStartTimeRef.current) {
+      lastStartTimeRef.current = null;
+    }
+    let midHandled = midFired;
 
     function draw(now: number) {
       if (cancelled) return;
+
       if (lastStartTimeRef.current == null) lastStartTimeRef.current = now;
       const elapsed = elapsedBeforePause + (now - lastStartTimeRef.current);
       let p = Math.min(1, elapsed / animateShip.duration);
-      setAnimProgress(p);
 
-      // Handle mid-point event
-      if (!localMidFired && p >= 0.5) {
-        if (animateShip.risk && animateShip.onMidpoint) animateShip.onMidpoint();
-        setMidFired(true);
-        localMidFired = true;
+      // If paused externally (i.e., during event), save elapsed and exit loop
+      if (animateShip.paused) {
+        savedElapsedRef.current = elapsed;
+        // Do not increase progress, just "freeze"
+        setAnimProgress(elapsed / animateShip.duration);
+        if (shipAnimRef.current) cancelAnimationFrame(shipAnimRef.current);
+        shipAnimRef.current = null;
+        return;
       }
 
-      if (p < 1 && !animateShip.paused) {
+      // Check for mid-point (event trigger)
+      if (!midHandled && p >= 0.5) {
+        // Stop at p = 0.5 if risk/event exists and call onMidpoint
+        if (animateShip.risk && animateShip.onMidpoint) {
+          setAnimProgress(0.5);
+          savedElapsedRef.current = animateShip.duration * 0.5;
+          setMidFired(true);
+          midHandled = true;
+          animateShip.onMidpoint();
+          // Pause anim; don't continue animating until unpaused
+          // No RAF scheduled, so animation stops until unpaused
+          if (shipAnimRef.current) cancelAnimationFrame(shipAnimRef.current);
+          shipAnimRef.current = null;
+          return;
+        } else {
+          midHandled = true;
+          setMidFired(true);
+        }
+      }
+
+      setAnimProgress(p);
+
+      if (p < 1) {
         raf = requestAnimationFrame(draw);
-      } else if (p >= 1) {
-        setAnimProgress(1); // Ensure final state
+        shipAnimRef.current = raf;
+      } else {
+        setAnimProgress(1); // Ensure full progress
         if (animateShip.onAnimationEnd) animateShip.onAnimationEnd();
+        if (shipAnimRef.current) cancelAnimationFrame(shipAnimRef.current);
+        shipAnimRef.current = null;
       }
     }
 
+    // Handle resume/pause logic always from correct progress/time
     if (animateShip.paused) {
-      // When paused, stop animation loop (do not reset anything!)
-      lastElapsedRef.current = animProgress * animateShip.duration;
+      // If entering paused state, save progress
+      if (shipAnimRef.current) cancelAnimationFrame(shipAnimRef.current);
+      savedElapsedRef.current = animProgress * animateShip.duration;
       lastStartTimeRef.current = null;
     } else {
-      lastStartTimeRef.current = null; // Will be set on first frame
+      // Resume animation or initial start
+      elapsedBeforePause = savedElapsedRef.current;
+      lastStartTimeRef.current = null;
       raf = requestAnimationFrame(draw);
+      shipAnimRef.current = raf;
     }
 
     return () => {
@@ -136,50 +149,8 @@ const MapMed = (props: any) => {
     animateShip?.from,
     animateShip?.to,
     animateShip?.duration,
-    // NOTE: "paused" is intentionally NOT included here,
+    animateShip?.paused,
   ]);
-
-  // Resume animation when paused flag is removed; use current animProgress
-  useEffect(() => {
-    if (!animateShip) return;
-    if (!animateShip.paused) {
-      // Resume from current animation progress
-      let raf: number;
-      let cancelled = false;
-
-      let elapsedBeforePause = animProgress * animateShip.duration;
-      let localMidFired = midFired;
-
-      function draw(now: number) {
-        if (cancelled) return;
-        if (lastStartTimeRef.current == null) lastStartTimeRef.current = now;
-        const elapsed = elapsedBeforePause + (now - lastStartTimeRef.current);
-        let p = Math.min(1, elapsed / animateShip.duration);
-        setAnimProgress(p);
-
-        if (!localMidFired && p >= 0.5) {
-          if (animateShip.risk && animateShip.onMidpoint) animateShip.onMidpoint();
-          setMidFired(true);
-          localMidFired = true;
-        }
-
-        if (p < 1 && !animateShip.paused) {
-          raf = requestAnimationFrame(draw);
-        } else if (p >= 1) {
-          setAnimProgress(1);
-          if (animateShip.onAnimationEnd) animateShip.onAnimationEnd();
-        }
-      }
-
-      raf = requestAnimationFrame(draw);
-
-      return () => {
-        cancelled = true;
-        if (raf) cancelAnimationFrame(raf);
-      };
-    }
-    // eslint-disable-next-line
-  }, [animateShip?.paused]);
 
   return (
     <div className="w-full flex justify-center my-2">
