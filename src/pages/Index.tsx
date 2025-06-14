@@ -103,14 +103,19 @@ const Index = () => {
   }
 
   function handleConfirmDefendShips(numShips: number, shipPrice: number) {
+    // Set defend ships (Charges the user)
     setDefendShips(numShips, shipPrice);
-    setDefendShipsModalOpen(false);
-    
-    // Get the current pending sail info
+
+    // Immediately trigger the sailing, then close defend modal and pending state.
     const { dest, travelTime } = pendingSailRef.current;
     if (dest && travelTime !== undefined) {
-      // Start sailing immediately without setTimeout
       handleSail(dest, travelTime);
+      updatePendingSail({ open: false }); // Close sail modal and clear dest
+      setDefendShipsModalOpen(false);
+      // No need to wait for modal closing, animation/map will show right away.
+    } else {
+      // Defensive: just close modal, but this shouldn't happen if flow is right
+      setDefendShipsModalOpen(false);
       updatePendingSail({ open: false });
     }
   }
