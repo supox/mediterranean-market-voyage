@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableHeader,
@@ -59,10 +58,7 @@ export default function PricesTable({ pricesByCountry, country }: PricesTablePro
           ))}
         </TableBody>
       </Table>
-      <div className="text-sm text-blue-800/70 mt-1 text-center">
-        <span className="font-medium">Your current port:</span>{" "}
-        <span className="font-bold">{country}</span>
-      </div>
+      {/* Removed the port footer text here */}
     </div>
   );
 }
