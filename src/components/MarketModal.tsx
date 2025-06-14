@@ -1,12 +1,19 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
+// Helper to get a random price between min and max (inclusive), rounded to nearest 5
+function randomPrice(min: number, max: number) {
+  const rand = Math.floor(Math.random() * ((max - min) / 5 + 1));
+  return min + rand * 5;
+}
+
 const MOCK_PRICES = {
-  Wheat: Math.floor(Math.random() * 10 + 8),
-  Olives: Math.floor(Math.random() * 25 + 18),
-  Copper: Math.floor(Math.random() * 55 + 44),
+  Wheat: randomPrice(35, 200),
+  Olives: randomPrice(70, 400), // Olives are more expensive than Wheat
+  Copper: randomPrice(150, 1000), // Copper is most expensive
 };
 
 const GOODS = [
@@ -20,7 +27,7 @@ interface MarketModalProps {
   onClose: () => void;
   onTrade: (type: string, quantity: number, isBuy: boolean) => void;
   balance: number;
-  cargo: { type: string; amount: number }[]; // <-- NEW!
+  cargo: { type: string; amount: number }[];
 }
 
 const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance, cargo }) => {
