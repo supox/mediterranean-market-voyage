@@ -19,14 +19,14 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
   country,
 }) => {
   return (
-    <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
+    <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-6 mt-4" dir="rtl">
       <button
         onClick={onMarket}
         className="flex flex-col items-center p-5 bg-gradient-to-b from-yellow-50 to-white border border-yellow-100 rounded-xl shadow hover:scale-[1.03] focus:ring-2 focus:ring-blue-200 transition-all duration-150"
         disabled={disabled}
       >
         <Store size={34} className="mb-2 text-yellow-700" />
-        <span className="font-semibold text-lg">Go to Market</span>
+        <span className="font-semibold text-lg">גש לשוק</span>
       </button>
       <button
         onClick={onBank}
@@ -34,7 +34,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
         disabled={disabled}
       >
         <Banknote size={34} className="mb-2 text-green-700" />
-        <span className="font-semibold text-lg">Go to Bank</span>
+        <span className="font-semibold text-lg">גש לבנק</span>
       </button>
       <button
         onClick={onSail}
@@ -42,7 +42,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
         disabled={disabled}
       >
         <Ship size={34} className="mb-2 text-blue-700" />
-        <span className="font-semibold text-lg">Sail</span>
+        <span className="font-semibold text-lg">הפלג</span>
       </button>
       <button
         onClick={onRest}
@@ -50,7 +50,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
         disabled={disabled}
       >
         <Clock size={34} className="mb-2 text-gray-600" />
-        <span className="font-semibold text-lg">Rest Until Next Day</span>
+        <span className="font-semibold text-lg">נח עד מחר</span>
       </button>
     </div>
   );

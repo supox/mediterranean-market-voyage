@@ -21,19 +21,19 @@ const weatherInfo: Record<
   { label: string; icon: React.ReactNode; desc: string }
 > = {
   Sunny: {
-    label: "Sunny Skies",
+    label: "שמיים בהירים",
     icon: <Sun size={40} className="text-yellow-400" />,
-    desc: "It's a bright, sunny day on the Mediterranean.",
+    desc: "זהו יום שמשי ובהיר בים התיכון.",
   },
   Stormy: {
-    label: "Stormy Weather",
+    label: "מזג אוויר סוער",
     icon: <CloudRain size={40} className="text-blue-400" />,
-    desc: "Storms loom over the sea. Sailing could be risky.",
+    desc: "סערות פוקדות את הים. מסוכן להפליג.",
   },
   Overcast: {
-    label: "Overcast",
+    label: "מעונן",
     icon: <CloudRain size={40} className="text-gray-400" />,
-    desc: "The sky is overcast, with grey clouds all around.",
+    desc: "השמיים מעוננים, עננים אפורים בכל מקום.",
   },
 };
 
@@ -50,31 +50,30 @@ const DayStartModal: React.FC<DayStartModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-xs flex flex-col items-center animate-fade-in pt-4">
-        {/* New: Show the uploaded image at the top */}
+    <Dialog open={open} onOpenChange={onClose} dir="rtl">
+      <DialogContent className="max-w-xs flex flex-col items-center animate-fade-in pt-4" dir="rtl">
         <img
           src="/lovable-uploads/d7086654-ee76-4b8e-8f73-989a18c0eff3.png"
-          alt="Merchant starting a new day"
+          alt="סוחר מתחיל יום חדש"
           className="rounded-lg w-[180px] h-[120px] object-cover mb-2 shadow-md"
           draggable={false}
         />
         <DialogHeader>
           <DialogTitle className="flex flex-col items-center">
-            <span className="text-2xl mb-1">Day {day}</span>
+            <span className="text-2xl mb-1">יום {day}</span>
             {info.icon}
             <span className="mt-2 font-bold">{info.label}</span>
           </DialogTitle>
         </DialogHeader>
         <DialogDescription className="mt-2 text-base text-center">
-          {info.desc || `Today's weather: ${weather}.`}
+          {info.desc || `מזג האוויר היום: ${weather}.`}
         </DialogDescription>
         {onClose && (
           <button
             className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             onClick={onClose}
           >
-            OK
+            אישור
           </button>
         )}
       </DialogContent>
@@ -83,4 +82,3 @@ const DayStartModal: React.FC<DayStartModalProps> = ({
 };
 
 export default DayStartModal;
-

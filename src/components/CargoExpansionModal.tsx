@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -22,26 +23,26 @@ const CargoExpansionModal: React.FC<CargoExpansionModalProps> = ({
   onDecline,
 }) => {
   return (
-    <Dialog open={open} onOpenChange={onDecline}>
-      <DialogContent className="max-w-md">
+    <Dialog open={open} onOpenChange={onDecline} dir="rtl">
+      <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader>
           <DialogTitle className="text-2xl mb-1 text-blue-900 font-bold">
-            Cargo Expansion Offer!
+            הצעה להרחבת מטען!
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center mb-2">
           <span className="text-5xl mb-2">🚢</span>
           <p className="text-base text-gray-700 mb-2 text-center">
-            A local shipwright offers to refit your ship for extra cargo capacity!
+            בנאי מקומי מציע לשדרג את האוניה להובלת מטען נוסף!
             <br />
             <span className="font-semibold text-slate-800">
-              Double your cargo limit from{" "}
-              <span className="text-blue-700">{currentCapacity} tons</span>{" "}
+              הכפל את מגבלת המטען מ-
+              <span className="text-blue-700">{currentCapacity} טון</span>
               <span className="mx-1">→</span>
-              <span className="text-green-700">{newCapacity} tons</span>
+              <span className="text-green-700">{newCapacity} טון</span>
             </span>
             <br />
-            For a one-time payment of:
+            בתשלום חד פעמי של:
             <span className="block text-2xl font-bold text-amber-600 mt-2">
               {price.toLocaleString()} ₪
             </span>
@@ -54,14 +55,14 @@ const CargoExpansionModal: React.FC<CargoExpansionModalProps> = ({
             disabled={balance < price}
             onClick={onAccept}
           >
-            Accept Offer
+            קבל הצעה
           </Button>
           <Button className="w-full" variant="outline" onClick={onDecline}>
-            Decline
+            דחה הצעה
           </Button>
           {balance < price && (
             <span className="text-xs text-red-500 text-center">
-              Not enough funds
+              אין מספיק כסף
             </span>
           )}
         </div>

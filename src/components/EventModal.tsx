@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Ship, Flag, MessageSquare, Coins } from "lucide-react";
@@ -22,6 +21,14 @@ const ICONS: Record<string, JSX.Element> = {
   Storm: <MessageSquare size={32} className="text-blue-400" />,
   Treasure: <Coins size={32} className="text-amber-500" />,
   "Deserted Ships": <Ship size={32} className="text-amber-600" />,
+};
+
+const HE_TITLES: Record<string, string> = {
+  Pirate: "מתקפת שודדי ים",
+  Storm: "סערה בים",
+  "Navigation Error": "שגיאה בניווט",
+  "Deserted Ships": "אוניות נטושות",
+  Treasure: "אוצר מוסתר",
 };
 
 const PIRATE_IMAGE_SRC = "/lovable-uploads/c79ea32b-8d77-4a6d-8804-990b2720a110.png";
@@ -65,21 +72,11 @@ const EventModal: React.FC<EventModalProps> = ({
   const isStorm = type === "Storm";
   const isDesertedShips = type === "Deserted Ships";
   const isNavError = type === "Navigation Error";
-  const eventTitle = isPirate
-    ? "Pirates attack"
-    : isStorm
-    ? "Storm at Sea"
-    : isDesertedShips
-    ? "Deserted Ships"
-    : isNavError
-    ? "Navigation Error"
-    : type
-    ? `${type} Event`
-    : "Event";
+  const eventTitle = HE_TITLES[type] || (type ? `${type} אירוע` : "אירוע");
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md flex flex-col items-center">
+    <Dialog open={open} onOpenChange={onClose} dir="rtl">
+      <DialogContent className="max-w-md flex flex-col items-center" dir="rtl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 justify-center w-full">
             {isPirate ? (
@@ -99,7 +96,7 @@ const EventModal: React.FC<EventModalProps> = ({
         {isPirate && (
           <img
             src={PIRATE_IMAGE_SRC}
-            alt="Pirate encounter"
+            alt="פגישה עם שודדי ים"
             className="w-full rounded-lg shadow mb-3 border border-amber-600"
             style={{ maxHeight: 180, objectFit: "cover" }}
             draggable={false}
@@ -108,7 +105,7 @@ const EventModal: React.FC<EventModalProps> = ({
         {isStorm && (
           <img
             src={STORM_IMAGE_SRC}
-            alt="Storm at sea"
+            alt="סערה בים"
             className="w-full rounded-lg shadow mb-3 border border-blue-600"
             style={{ maxHeight: 180, objectFit: "cover" }}
             draggable={false}
@@ -117,7 +114,7 @@ const EventModal: React.FC<EventModalProps> = ({
         {isDesertedShips && (
           <img
             src={DESERTED_SHIPS_IMAGE_SRC}
-            alt="Deserted ships"
+            alt="אוניות נטושות"
             className="w-full rounded-lg shadow mb-3 border border-amber-600"
             style={{ maxHeight: 180, objectFit: "cover" }}
             draggable={false}
@@ -126,7 +123,7 @@ const EventModal: React.FC<EventModalProps> = ({
         {isNavError && (
           <img
             src={NAV_ERROR_IMAGE_SRC}
-            alt="Navigation error"
+            alt="שגיאת ניווט"
             className="w-full rounded-lg shadow mb-3 border border-yellow-400"
             style={{ maxHeight: 180, objectFit: "cover" }}
             draggable={false}
@@ -136,7 +133,7 @@ const EventModal: React.FC<EventModalProps> = ({
           <div className="flex flex-col items-center justify-center w-full py-8">
             <div className="text-lg font-semibold text-center mb-6">{outcome}</div>
             <Button className="mt-2 w-36" onClick={handleOk}>
-              OK
+              אישור
             </Button>
           </div>
         ) : (
@@ -145,7 +142,7 @@ const EventModal: React.FC<EventModalProps> = ({
             {showOkButton || isNavError ? (
               <div className="flex flex-col gap-2 mt-4 w-full items-center">
                 <Button className="w-40" onClick={handleOk}>
-                  OK
+                  אישור
                 </Button>
               </div>
             ) : options && options.length > 0 ? (
@@ -170,4 +167,3 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
-

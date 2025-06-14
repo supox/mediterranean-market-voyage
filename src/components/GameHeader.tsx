@@ -1,4 +1,3 @@
-
 import { Banknote, MapPin, Ship, Clock, Sun, CloudRain, Wheat, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +17,16 @@ const weatherIcons: Record<string, JSX.Element> = {
   Overcast: <CloudRain size={20} className="text-gray-400" />,
 };
 
-const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// Use Hebrew day names, starting from Sunday
+const DAY_NAMES = [
+  "יום ראשון",
+  "יום שני",
+  "יום שלישי",
+  "יום רביעי",
+  "יום חמישי",
+  "יום שישי",
+  "שבת"
+];
 
 function GoodIcon({ name }: { name: string }) {
   if (name === "Wheat") return <Wheat size={16} className="text-amber-500" />;
@@ -47,14 +55,17 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   const dayIdx = ((day - 1) % 7 + 7) % 7; // ensure 0-based, handles edge cases
   const dayName = DAY_NAMES[dayIdx];
   return (
-    <div className="w-full bg-gradient-to-b from-blue-100 via-blue-50 to-white border-b border-blue-300 py-2 px-4 flex flex-col md:flex-row items-center md:justify-between gap-4 shadow-sm sticky top-0 z-30">
-      {/* Left: Status */}
+    <div
+      className="w-full bg-gradient-to-b from-blue-100 via-blue-50 to-white border-b border-blue-300 py-2 px-4 flex flex-col md:flex-row items-center md:justify-between gap-4 shadow-sm sticky top-0 z-30"
+      dir="rtl"
+    >
+      {/* Right now: Day & Time */}
       <div className="flex items-center gap-5 text-xl font-medium">
         <span className="flex items-center gap-2">
           <Clock size={20} className="text-blue-700" />
           {dayName}
         </span>
-        <span className="flex items-center gap-2 pl-2">
+        <span className="flex items-center gap-2 pr-2">
           <Ship size={20} className="text-blue-700" />
           {timeOfDay}
         </span>
@@ -64,14 +75,14 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         <span className="flex items-center gap-2 font-semibold">
           <span className="text-2xl" aria-label={country}>{countryFlags[country]}</span>
           <MapPin size={18} className="text-blue-700" />
-          {country}
+          {country === "Turkey" ? "טורקיה" : country === "Israel" ? "ישראל" : country === "Egypt" ? "מצרים" : country}
         </span>
         <span className="flex items-center gap-2">
           {weatherIcons[weather] || <Sun size={18} className="text-yellow-300" />}
-          <span className="text-base">{weather}</span>
+          <span className="text-base">{weather === "Sunny" ? "שמשי" : weather === "Stormy" ? "סוער" : weather === "Overcast" ? "מעונן" : weather}</span>
         </span>
       </div>
-      {/* Right: Balance & Cargo */}
+      {/* Left: Balance & Cargo */}
       <div className="flex items-center gap-5">
         <span className="flex items-center gap-1 text-green-700 font-bold text-lg">
           <Banknote size={19} />
@@ -89,7 +100,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
               )}>
                 {good.amount}
               </span>
-              <span className="hidden md:inline">{good.type}</span>
+              <span className="hidden md:inline">{good.type === "Wheat" ? "חיטה" : good.type === "Olives" ? "זיתים" : good.type === "Copper" ? "נחושת" : good.type}</span>
             </span>
           ))}
         </div>
@@ -99,4 +110,3 @@ const GameHeader: React.FC<GameHeaderProps> = ({
 };
 
 export default GameHeader;
-

@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,33 +35,31 @@ const BankModal: React.FC<BankModalProps> = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm sm:max-w-md">
+    <Dialog open={open} onOpenChange={onClose} dir="rtl">
+      <DialogContent className="max-w-sm sm:max-w-md" dir="rtl">
         <DialogHeader>
-          <DialogTitle>Bank</DialogTitle>
+          <DialogTitle>בנק</DialogTitle>
         </DialogHeader>
-        {/* Bank image section */}
         <div className="flex justify-center mb-3">
           <img
             src="/lovable-uploads/0508b10a-86f6-456a-b1ca-2ae4fb6d8fb7.png"
-            alt="Medieval Banker Illustration"
+            alt="איור בנק מימי הביניים"
             className="w-32 h-32 object-contain rounded-md shadow"
             style={{ background: "#e7dbb2" }}
           />
         </div>
-        {/* Centered Deposit/Withdraw buttons */}
         <div className="flex justify-center gap-3 mb-3 mt-2">
           <button
             onClick={() => setActiveTab("deposit")}
             className={`px-4 py-1 rounded-md border ${activeTab === "deposit" ? "bg-green-600 text-white border-green-600" : "bg-slate-50 border-slate-200"}`}
-          >Deposit</button>
+          >הפקדה</button>
           <button
             onClick={() => setActiveTab("withdraw")}
             className={`px-4 py-1 rounded-md border ${activeTab === "withdraw" ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200"}`}
-          >Withdraw</button>
+          >משיכה</button>
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="bank-amount">{activeTab === "deposit" ? "Deposit Amount" : "Withdraw Amount"}:</Label>
+          <Label htmlFor="bank-amount">{activeTab === "deposit" ? "סכום הפקדה" : "סכום משיכה"}:</Label>
           <Input
             id="bank-amount"
             type="number"
@@ -72,8 +71,8 @@ const BankModal: React.FC<BankModalProps> = ({
           />
           <span className="text-xs text-gray-400">
             {activeTab === "deposit"
-              ? `Available: ${maxDeposit.toLocaleString()} ₪`
-              : `In Bank: ${maxWithdraw.toLocaleString()} ₪`}
+              ? `זמין: ${maxDeposit.toLocaleString()} ₪`
+              : `בבנק: ${maxWithdraw.toLocaleString()} ₪`}
           </span>
         </div>
         <button
@@ -81,7 +80,7 @@ const BankModal: React.FC<BankModalProps> = ({
           disabled={amount < 1 || (activeTab === "deposit" ? amount > maxDeposit : amount > maxWithdraw)}
           onClick={handleBank}
         >
-          {activeTab === "deposit" ? "Deposit" : "Withdraw"} {amount > 0 && amount} ₪
+          {activeTab === "deposit" ? "הפקד" : "משוך"} {amount > 0 && amount} ₪
         </button>
       </DialogContent>
     </Dialog>

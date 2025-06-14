@@ -20,34 +20,31 @@ const DefendShipsModal: React.FC<DefendShipsModalProps> = ({
   cargoValue,
   onConfirm,
 }) => {
-  // Calculate dynamic price: e.g. 8% of total value (balance + cargo) per ship, minimum 300, max 4000.
+  // Calculate dynamic price as before
   const totalValue = balance + cargoValue;
   const pricePerShip = Math.max(300, Math.min(Math.round(totalValue * 0.08), 4000));
-
   const [selected, setSelected] = useState(0);
-
-  // Max ships: do not let user rent more than affordable
   const maxShips = Math.min(5, Math.floor(balance / pricePerShip));
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md flex flex-col items-center">
+    <Dialog open={open} onOpenChange={onClose} dir="rtl">
+      <DialogContent className="max-w-md flex flex-col items-center" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-center font-bold">Hire Defend Ships?</DialogTitle>
+          <DialogTitle className="text-center font-bold">שכור ספינות ליווי?</DialogTitle>
           <DialogDescription className="text-center mt-1">
-            Pirate activity is known along these routes.<br />
-            For extra protection, you can hire defend ships (escorts) before your journey.<br />
-            Each escort increases your odds of victory and plunder if pirates attack!
+            פעילות שודדי ים מוכרת באזור זה.
+            <br />
+            ניתן לשכור ספינות ליווי (שמירה) לפני ההפלגה. כל ליווי מעלה את סיכויי ההגנה והשלל!
           </DialogDescription>
         </DialogHeader>
         <img
           src={PIRATE_BOAT_IMG}
-          alt="Defend ships"
+          alt="ספינות ליווי"
           className="w-44 h-36 object-contain mx-auto rounded shadow mb-3 border border-neutral-300 bg-neutral-100"
           draggable={false}
         />
         <div className="w-full text-center text-base my-2">
-          <span className="font-semibold text-blue-900">Choose number of defend ships to hire:</span>
+          <span className="font-semibold text-blue-900">בחר את מספר הספינות להגנה:</span>
         </div>
         <div className="flex flex-row justify-center gap-2 my-1">
           {[...Array(maxShips + 1).keys()].map(n => (
@@ -63,23 +60,23 @@ const DefendShipsModal: React.FC<DefendShipsModalProps> = ({
           ))}
         </div>
         <div className="text-sm text-gray-700 my-1 text-center w-full">
-          Each ship costs <b>{pricePerShip} ₪</b>.<br />
+          כל ספינה עולה <b>{pricePerShip} ₪</b>.<br />
           {maxShips === 0
-            ? <span className="text-red-600">Not enough funds to hire a ship.</span>
+            ? <span className="text-red-600">אין מספיק כסף לשכור ליווי.</span>
             : <span>
-                Total: <b>{selected * pricePerShip} ₪</b>
+                סה"כ: <b>{selected * pricePerShip} ₪</b>
               </span>
           }
         </div>
         <div className="flex flex-row gap-2 mt-3 justify-center w-full">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            ביטול
           </Button>
           <Button
             onClick={() => onConfirm(selected, pricePerShip)}
             disabled={selected * pricePerShip > balance}
           >
-            Hire {selected > 0 ? selected : "no"} ship{selected === 1 ? "" : "s"}
+            שכור {selected > 0 ? selected : "אין"} ספינות
           </Button>
         </div>
       </DialogContent>

@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Map } from "lucide-react";
 import { useState } from "react";
@@ -6,9 +5,9 @@ import MapMed from "./MapMed";
 
 // Only the 3 main countries remain
 const DESTS = [
-  { name: "Turkey", flag: "🇹🇷" },
-  { name: "Israel", flag: "🇮🇱" },
-  { name: "Egypt", flag: "🇪🇬" },
+  { name: "Turkey", flag: "🇹🇷", hebrew: "טורקיה" },
+  { name: "Israel", flag: "🇮🇱", hebrew: "ישראל" },
+  { name: "Egypt", flag: "🇪🇬", hebrew: "מצרים" },
 ];
 
 // Only allowed routes (user can *not* cross over directly from Turkey <-> Egypt except as allowed).
@@ -20,7 +19,7 @@ const ROUTES: Record<string, Record<string, number>> = {
 
 function formatTravelTime(days: number) {
   const hours = Math.round(days * 12);
-  return `${hours} hour${hours !== 1 ? "s" : ""}`;
+  return `${hours} שעות`;
 }
 
 interface SailModalProps {
@@ -82,18 +81,18 @@ const SailModal: React.FC<SailModalProps> = ({
   const atNight = currentHour >= DEFAULT_END_HOUR;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl sm:max-w-2xl">
+    <Dialog open={open} onOpenChange={onClose} dir="rtl">
+      <DialogContent className="max-w-xl sm:max-w-2xl" dir="rtl">
         <DialogHeader>
           <DialogTitle>
             <span className="inline-flex items-center gap-2">
-              <Map size={20} /> Choose Your Destination
+              <Map size={20} /> בחר יעד הפלגה
             </span>
           </DialogTitle>
           <DialogDescription>
             {atNight
-              ? "It's too late to set sail. Rest until next day to continue traveling."
-              : "Click a reachable port on the map. Unavailable destinations are greyed out."}
+              ? "מאוחר מדי לצאת להפלגה. יש לנוח עד הבוקר."
+              : "לחץ על נמל נגיש במפה. יעדים לא זמינים יהיו באפור."}
           </DialogDescription>
         </DialogHeader>
         <div>
@@ -110,15 +109,15 @@ const SailModal: React.FC<SailModalProps> = ({
         {dest && (
           <div className="flex justify-center mb-2">
             <span className="rounded px-3 py-1 bg-blue-50 border text-blue-900 border-blue-200 font-semibold text-sm">
-              {dest} — {formatTravelTime(ROUTES[currentCountry][dest])}
+              {DESTS.find(d => d.name === dest)?.hebrew} — {formatTravelTime(ROUTES[currentCountry][dest])}
             </span>
           </div>
         )}
         {destinations.length === 0 || atNight ? (
           <div className="w-full py-2 text-center text-blue-700/90 mt-2 bg-blue-50 border border-blue-200 rounded-lg font-medium text-sm">
             {atNight
-              ? "You must rest until the next day to sail."
-              : "No destinations can be reached before nightfall. Try again next day."}
+              ? "עליך לנוח עד הבוקר כדי להפליג."
+              : "לא ניתן להגיע ליעדים לפני רדת הלילה. נסה שוב מחר."}
           </div>
         ) : (
           <button
@@ -126,7 +125,7 @@ const SailModal: React.FC<SailModalProps> = ({
             disabled={!dest || disabled.includes(dest)}
             onClick={handlePickDestination}
           >
-            {dest ? `Next: Hire Defend Ships` : "Select Destination on Map"}
+            {dest ? "המשך: שכור ספינות ליווי" : "בחר יעד במפה"}
           </button>
         )}
       </DialogContent>

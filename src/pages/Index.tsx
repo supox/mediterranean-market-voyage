@@ -146,7 +146,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-yellow-50 w-full">
+    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-yellow-50 w-full" dir="rtl">
       <GameHeader
         day={Math.min(day, 7)}
         timeOfDay={formattedTime}
@@ -169,7 +169,7 @@ const Index = () => {
       </div> */}
       <div className="max-w-4xl mx-auto flex flex-col items-center justify-center pt-10 pb-12 px-3">
         <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow">
-          🌊 Merchant of the Mediterranean
+          🌊 סוחר הים התיכון
         </h1>
         {isGameOver ? (
           <GameOver balance={balance} cargo={cargo} onPlayAgain={resetGame} />

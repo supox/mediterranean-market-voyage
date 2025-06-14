@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,9 +10,9 @@ function randomPrice(min: number, max: number) {
 }
 
 const GOODS = [
-  { type: "Wheat", icon: "🌾" },
-  { type: "Olives", icon: "🫒" },
-  { type: "Copper", icon: "🥉" },
+  { type: "Wheat", icon: "🌾", hebrew: "חיטה" },
+  { type: "Olives", icon: "🫒", hebrew: "זיתים" },
+  { type: "Copper", icon: "🥉", hebrew: "נחושת" },
 ];
 
 interface MarketModalProps {
@@ -75,24 +74,24 @@ const MarketModal: React.FC<MarketModalProps> = ({
   const marketImage = countryImages[country];
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm sm:max-w-md">
+    <Dialog open={open} onOpenChange={onClose} dir="rtl">
+      <DialogContent className="max-w-sm sm:max-w-md" dir="rtl">
         <DialogHeader>
-          <DialogTitle>{isBuy ? "Buy" : "Sell"} Goods</DialogTitle>
+          <DialogTitle>{isBuy ? "קנה סחורה" : "מכור סחורה"}</DialogTitle>
         </DialogHeader>
         {/* Larger, less-padded Image for Market popup */}
         <div className="flex justify-center items-center mb-1" style={{ background: "#f2e6c9", borderRadius: 12, minHeight: 0 }}>
           {marketImage ? (
             <img
               src={marketImage}
-              alt={`Marketplace in ${country}`}
+              alt={`שוק ב${country === "Israel" ? "ישראל" : country === "Turkey" ? "טורקיה" : country === "Egypt" ? "מצרים" : country}`}
               className="w-60 h-44 object-cover rounded-md shadow border"
               style={{ margin: 0, padding: 0 }}
             />
           ) : (
             <img
               src="/lovable-uploads/b9972723-2bb9-4b5c-a63c-fff1ab433467.png"
-              alt="Marketplace Illustration"
+              alt="איור שוק"
               className="w-60 h-44 object-cover rounded-md shadow border"
               style={{ margin: 0, padding: 0 }}
             />
@@ -110,14 +109,14 @@ const MarketModal: React.FC<MarketModalProps> = ({
               <span role="img" aria-label={g.type}>
                 {g.icon}
               </span>
-              <span className="ml-2 text-base">{g.type}</span>
+              <span className="ml-2 text-base">{g.hebrew}</span>
             </button>
           ))}
         </div>
         <div className="flex items-center gap-5 mb-2">
-          <Label>Price:</Label>
+          <Label>מחיר:</Label>
           <span className="font-semibold">
-            {price.toLocaleString()} ₪ / ton
+            {price.toLocaleString()} ₪ / טון
           </span>
         </div>
         <div className="flex gap-3 mb-3">
@@ -129,7 +128,7 @@ const MarketModal: React.FC<MarketModalProps> = ({
                 : "bg-slate-50 border-slate-200"
             }`}
           >
-            Buy
+            קנייה
           </button>
           <button
             onClick={() => setIsBuy(false)}
@@ -139,11 +138,11 @@ const MarketModal: React.FC<MarketModalProps> = ({
                 : "bg-slate-50 border-slate-200"
             }`}
           >
-            Sell
+            מכירה
           </button>
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="quantity">Amount (tons):</Label>
+          <Label htmlFor="quantity">כמות (טון):</Label>
           <div className="flex items-center gap-2">
             <Input
               id="quantity"
@@ -161,13 +160,13 @@ const MarketModal: React.FC<MarketModalProps> = ({
               disabled={isBuy ? maxAffordable <= 0 : maxAffordable <= 0}
               onClick={isBuy ? handleBuyAll : handleSellAll}
             >
-              {isBuy ? "Buy All" : "Sell All"}
+              {isBuy ? "קנה הכל" : "מכור הכל"}
             </button>
           </div>
           <span className="text-xs text-gray-400">
             {isBuy
-              ? `You can buy up to ${maxAffordable} tons`
-              : `You can sell up to ${maxAffordable} tons`}
+              ? `ניתן לקנות עד ${maxAffordable} טון`
+              : `ניתן למכור עד ${maxAffordable} טון`}
           </span>
         </div>
         <button
@@ -175,7 +174,7 @@ const MarketModal: React.FC<MarketModalProps> = ({
           disabled={quantity < 1 || quantity > maxAffordable}
           onClick={handleTrade}
         >
-          {isBuy ? "Buy" : "Sell"} {quantity > 0 && quantity} {type}
+          {isBuy ? "קנה" : "מכור"} {quantity > 0 && quantity} {GOODS.find(g => g.type === type)?.hebrew}
         </button>
       </DialogContent>
     </Dialog>
@@ -183,4 +182,3 @@ const MarketModal: React.FC<MarketModalProps> = ({
 };
 
 export default MarketModal;
-
