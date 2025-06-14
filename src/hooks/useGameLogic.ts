@@ -18,6 +18,13 @@ import { useEventHandlers } from "./useEventHandlers";
 import { useDefendShips } from "./useDefendShips";
 import { useMarketTrade } from "./useMarketTrade";
 
+// הוסף מילון תרגום של מדינות ממש בתחילת הקובץ (ליד הקבועות)
+const COUNTRY_LABELS: Record<string, string> = {
+  Turkey: "טורקיה",
+  Israel: "ישראל",
+  Egypt: "מצרים",
+};
+
 // Main game logic hook refactored!
 export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent: boolean) => void }) {
   const [day, setDay] = useState(1);
@@ -164,7 +171,7 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
       // Hebrew translation for the event description:
       setEventData({
         type: "Navigation Error",
-        description: `שגיאה בניווט! רוחות חזקות וניווט לקוי שולחים את הספינה ליעד אחר... הספינה עוגנת ב${navTarget} במקום.`,
+        description: `שגיאה בניווט! רוחות חזקות וניווט לקוי שולחים את הספינה ליעד אחר... הספינה עוגנת ב${COUNTRY_LABELS[navTarget] ?? navTarget} במקום.`,
         options: [], // No options, just show OK
       });
       setEventOpen(true);
