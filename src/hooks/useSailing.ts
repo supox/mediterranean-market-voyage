@@ -10,9 +10,7 @@ export function useSailing({
   setCountry,
   setWeather,
   advanceTime,
-  setSailing,
-  setSailingPaused,
-  setSailOpen,
+  setSailOpen, // Only keep what is actually used!
 }) {
   // Add ship animation state
   const [sailing, setSailingState] = useState<null | {
@@ -56,7 +54,7 @@ export function useSailing({
     pauseSailing,
     resumeSailing,
     finishSail,
-    setSailing, // proxy for parent
-    setSailingPaused,
+    // Do not proxy setSailing or setSailingPaused—they are internal only.
   };
 }
+
