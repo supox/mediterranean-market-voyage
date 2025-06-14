@@ -104,11 +104,11 @@ export default function Index() {
     if (type === "deposit") {
       setBalance((b) => b - amount);
       setBank((bk) => bk + amount);
-      toast({ description: `Deposited ${amount} ₤` });
+      toast({ description: `Deposited ${amount} NIS` });
     } else {
       setBalance((b) => b + amount);
       setBank((bk) => bk - amount);
-      toast({ description: `Withdrew ${amount} ₤` });
+      toast({ description: `Withdrew ${amount} NIS` });
     }
     advanceTime("short");
   }
@@ -200,13 +200,13 @@ export default function Index() {
             <div className="mb-1">
               <span className="font-medium">Final Balance:</span>{" "}
               <span className="text-green-700 font-extrabold text-2xl">
-                {balance.toLocaleString()} ₤
+                {balance.toLocaleString()} NIS
               </span>
             </div>
             <div className="mb-2">
               <span className="font-medium">Cargo Value (mock):</span>{" "}
               <span className="text-blue-800">
-                ~{(cargo.reduce((acc, g) => acc + (g.amount * 14), 0)).toLocaleString()} ₤
+                ~{(cargo.reduce((acc, g) => acc + (g.amount * 14), 0)).toLocaleString()} NIS
               </span>
             </div>
             <button

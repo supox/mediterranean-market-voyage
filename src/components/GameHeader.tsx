@@ -18,6 +18,8 @@ const weatherIcons: Record<string, JSX.Element> = {
   Overcast: <CloudRain size={20} className="text-gray-400" />,
 };
 
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 function GoodIcon({ name }: { name: string }) {
   if (name === "Wheat") return <Wheat size={16} className="text-amber-500" />;
   if (name === "Olives") return <Coins size={16} className="text-green-600" />;
@@ -42,13 +44,15 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   balance,
   cargo,
 }) => {
+  const dayIdx = ((day - 1) % 7 + 7) % 7; // ensure 0-based, handles edge cases
+  const dayName = DAY_NAMES[dayIdx];
   return (
     <div className="w-full bg-gradient-to-b from-blue-100 via-blue-50 to-white border-b border-blue-300 py-2 px-4 flex flex-col md:flex-row items-center md:justify-between gap-4 shadow-sm">
       {/* Left: Status */}
       <div className="flex items-center gap-5 text-xl font-medium">
         <span className="flex items-center gap-2">
           <Clock size={20} className="text-blue-700" />
-          Day {day}/7
+          {dayName}
         </span>
         <span className="flex items-center gap-2 pl-2">
           <Ship size={20} className="text-blue-700" />
@@ -71,7 +75,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
       <div className="flex items-center gap-5">
         <span className="flex items-center gap-1 text-green-700 font-bold text-lg">
           <Banknote size={19} />
-          {balance.toLocaleString()} ₤
+          {balance.toLocaleString()} NIS
         </span>
         <div className="flex gap-1">
           {cargo.map((good) => (
@@ -95,4 +99,3 @@ const GameHeader: React.FC<GameHeaderProps> = ({
 };
 
 export default GameHeader;
-
