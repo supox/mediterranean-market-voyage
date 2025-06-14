@@ -238,16 +238,21 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
     if (totalCargo === 0) return; // Should not happen since storm chance is 0 with no cargo
 
-    // Calculate cargo loss (10-30% of total cargo)
+    // Calculate cargo loss (10-30% of total cargo, minimum 1 ton)
     const lossPercentage = 0.1 + Math.random() * 0.2; // 10-30%
-    let cargoLost: Array<{ type: string; amount: number }> = [];
+    const baseLoss = Math.floor(totalCargo * lossPercentage);
+    const actualLoss = Math.max(1, baseLoss); // Ensure at least 1 ton is lost
     
-    // Calculate losses before updating state
+    let cargoLost: Array<{ type: string; amount: number }> = [];
+    let remainingToLose = actualLoss;
+    
+    // Calculate losses before updating state, distributing across available cargo
     const updatedCargo = cargo.map((good) => {
-      if (good.amount > 0) {
-        const lostAmount = Math.floor(good.amount * lossPercentage);
+      if (remainingToLose > 0 && good.amount > 0) {
+        const lostAmount = Math.min(good.amount, remainingToLose);
         if (lostAmount > 0) {
           cargoLost.push({ type: good.type, amount: lostAmount });
+          remainingToLose -= lostAmount;
           return { ...good, amount: good.amount - lostAmount };
         }
       }
