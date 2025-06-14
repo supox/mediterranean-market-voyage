@@ -170,12 +170,6 @@ const Index = () => {
           onClose={closeDayStartModal}
         />
       )}
-      {/* Removed cargo capacity indicator just below header */}
-      {/* <div className="w-full max-w-4xl mx-auto px-4 mt-2 text-right">
-        <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold text-sm drop-shadow">
-          Cargo Limit: {cargo.reduce((a, c) => a + c.amount, 0)}/{shipCapacity} tons
-        </span>
-      </div> */}
       <div className="max-w-4xl mx-auto flex flex-col items-center justify-center pt-10 pb-12 px-3">
         <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow">
           🌊 סוחר הים התיכון

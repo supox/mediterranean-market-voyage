@@ -145,11 +145,26 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
   function resetGame() {
     setDay(1);
     setCurrentHour(DAY_START_HOUR);
-    setCountry("Turkey");
+    setCountry("Israel");
     setWeather(getRandomWeather());
     setBalance(INITIAL_BALANCE);
     setCargo([...INITIAL_CARGO]);
     setBank(0);
+    setShipCapacity(BASE_SHIP_CAPACITY);
+
+    setMarketOpen(false);
+    setBankOpen(false);
+    setSailOpen(false);
+    setEventOpen(false);
+    cargoExpansion.setCargoExpansionModalOpen(false);
+    setShowDayStartModal(false);
+    setEventData({ type: "", description: "", options: [] });
+
+    setPricesByCountry(generatePricesForAllCountries(COUNTRIES));
+    defendShips.clearDefendShips();
+
+    // Optionally reset cargoExpansion state (offer)
+    cargoExpansion.declineCargoExpansion();
   }
 
   const cargoForHeader = [
