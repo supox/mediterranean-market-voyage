@@ -140,7 +140,7 @@ const Index = () => {
                   animateShip={{
                     from: sailing.from,
                     to: sailing.to,
-                    duration: 10_000,
+                    duration: 5_000, // Changed from 10_000 to 5_000 (5 seconds)
                     risk: sailing.risk,
                     paused: sailingPaused,
                     onMidpoint: handleMapMidpoint,
