@@ -1,26 +1,37 @@
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { generatePricesForAllCountries } from "@/utils/pricing";
+import {
+  INITIAL_BALANCE,
+  INITIAL_CARGO,
+  WEATHER_TYPES,
+  DAY_START_HOUR,
+  DAY_END_HOUR,
+  getRandomWeather,
+  formatTime,
+  COUNTRIES,
+} from "@/utils/gameHelpers";
+import { useSailing } from "./useSailing";
 
 // Game constants
-const INITIAL_BALANCE = 5000;
-const INITIAL_CARGO = [
-  { type: "Wheat", amount: 0 },
-  { type: "Olives", amount: 0 },
-  { type: "Copper", amount: 0 },
-];
-const WEATHER_TYPES = ["Sunny", "Stormy", "Overcast"];
-const DAY_START_HOUR = 8;
-const DAY_END_HOUR = 20;
+// const INITIAL_BALANCE = 5000;
+// const INITIAL_CARGO = [
+//   { type: "Wheat", amount: 0 },
+//   { type: "Olives", amount: 0 },
+//   { type: "Copper", amount: 0 },
+// ];
+// const WEATHER_TYPES = ["Sunny", "Stormy", "Overcast"];
+// const DAY_START_HOUR = 8;
+// const DAY_END_HOUR = 20;
 
 // Helper to get random weather
-const getRandomWeather = () =>
-  WEATHER_TYPES[Math.floor(Math.random() * WEATHER_TYPES.length)];
+// const getRandomWeather = () =>
+//   WEATHER_TYPES[Math.floor(Math.random() * WEATHER_TYPES.length)];
 
 // Helper to format time as "HH:00"
-function formatTime(hour: number) {
-  return hour.toString().padStart(2, "0") + ":00";
-}
+// function formatTime(hour: number) {
+//   return hour.toString().padStart(2, "0") + ":00";
+// }
 
 export function useGameLogic() {
   const [day, setDay] = useState(1);
@@ -51,13 +62,13 @@ export function useGameLogic() {
     cargo.find((g) => g.type === type) || { type, amount: 0 };
 
   // Add ship animation state
-  const [sailing, setSailing] = useState<null | {
-    from: string;
-    to: string;
-    travelTime: number;
-    risk: string | null; // event type, e.g. "Pirate", "Storm", etc.
-  }>(null);
-  const [sailingPaused, setSailingPaused] = useState(false);
+  // const [sailing, setSailing] = useState<null | {
+  //   from: string;
+  //   to: string;
+  //   travelTime: number;
+  //   risk: string | null; // event type, e.g. "Pirate", "Storm", etc.
+  // }>(null);
+  // const [sailingPaused, setSailingPaused] = useState(false);
 
   // Only advances the day if "rest" is called
   function advanceTime(hours: number | "rest") {
@@ -122,36 +133,48 @@ export function useGameLogic() {
   }
 
   // New: start ship animation instead of instantly moving country
-  function startSail(dest: string, travelDays: number) {
-    // Only sail if arrival is before or at 20:00
-    const travelHours = Math.round(travelDays * 12);
-    if (currentHour + travelHours > DAY_END_HOUR) {
-      toast({ title: "Cannot Sail", description: "You can't arrive after 20:00. Please rest until the next day." });
-      return;
-    }
-    // Pirate risk: 70% chance at night (>=18:00), 50% by day (<18:00), for testing
-    const risk =
-      Math.random() < (currentHour >= 18 ? 0.7 : 0.5) ? "Pirate" : null;
-    setSailing({ from: country, to: dest, travelTime: travelDays, risk });
-    setSailingPaused(false); // ensure not paused at start
-    setSailOpen(false); // Close the modal to animate map
-  }
+  // function startSail(dest: string, travelDays: number) {
+  //   // Only sail if arrival is before or at 20:00
+  //   const travelHours = Math.round(travelDays * 12);
+  //   if (currentHour + travelHours > DAY_END_HOUR) {
+  //     toast({ title: "Cannot Sail", description: "You can't arrive after 20:00. Please rest until the next day." });
+  //     return;
+  //   }
+  //   // Pirate risk: 70% chance at night (>=18:00), 50% by day (<18:00), for testing
+  //   const risk =
+  //     Math.random() < (currentHour >= 18 ? 0.7 : 0.5) ? "Pirate" : null;
+  //   setSailing({ from: country, to: dest, travelTime: travelDays, risk });
+  //   setSailingPaused(false); // ensure not paused at start
+  //   setSailOpen(false); // Close the modal to animate map
+  // }
 
-  function pauseSailing() {
-    setSailingPaused(true);
-  }
-  function resumeSailing() {
-    setSailingPaused(false);
-  }
+  // function pauseSailing() {
+  //   setSailingPaused(true);
+  // }
+  // function resumeSailing() {
+  //   setSailingPaused(false);
+  // }
 
-  // Called when animation finishes (or after event resolved)
-  function finishSail(dest: string, travelDays: number) {
-    setCountry(dest);
-    setWeather(getRandomWeather());
-    advanceTime(Math.round(travelDays * 12));
-    setSailing(null);
-    setSailingPaused(false);
-  }
+  // // Called when animation finishes (or after event resolved)
+  // function finishSail(dest: string, travelDays: number) {
+  //   setCountry(dest);
+  //   setWeather(getRandomWeather());
+  //   advanceTime(Math.round(travelDays * 12));
+  //   setSailing(null);
+  //   setSailingPaused(false);
+  // }
+
+  // Use sailing logic
+  const sailingLogic = useSailing({
+    country,
+    currentHour,
+    setCountry,
+    setWeather,
+    advanceTime,
+    setSailing,
+    setSailingPaused,
+    setSailOpen,
+  });
 
   // Called when event occurs during sailing
   function triggerEvent(risk: string) {
@@ -172,7 +195,7 @@ export function useGameLogic() {
       options,
     });
     setEventOpen(true);
-    setSailingPaused(true); // <- pause ship animation when event starts
+    sailingLogic.pauseSailing(); // <- pause ship animation when event starts
   }
 
   function handleEventOption(val: string) {
@@ -188,9 +211,9 @@ export function useGameLogic() {
     toast({ title: "Event Outcome", description: desc });
 
     // If currently sailing, finish sail after event
-    if (sailing) {
+    if (sailingLogic.sailing) {
       // Do not finish the sail here! Just resume animation; finishSail is triggered when animation ends.
-      setSailingPaused(false); // resume sailing after event
+      sailingLogic.resumeSailing(); // resume sailing after event
     }
   }
 
@@ -260,10 +283,10 @@ export function useGameLogic() {
     // Actions
     handleMarketTrade,
     handleBankAction,
-    handleSail: startSail, // note: changed name for animation API
-    finishSail,
+    handleSail: sailingLogic.startSail, // note: changed name for animation API
+    finishSail: sailingLogic.finishSail,
     triggerEvent,
-    sailing, // new, for animation
+    sailing: sailingLogic.sailing, // new, for animation
     handleEventOption,
     handleRest,
     resetGame,
@@ -276,9 +299,9 @@ export function useGameLogic() {
     pricesByCountry, // all countries
     dayStartHour: DAY_START_HOUR,
     dayEndHour: DAY_END_HOUR,
-    sailingPaused, // <--------- NEW
-    pauseSailing,
-    resumeSailing,
+    sailingPaused: sailingLogic.sailingPaused, // <--------- NEW
+    pauseSailing: sailingLogic.pauseSailing,
+    resumeSailing: sailingLogic.resumeSailing,
   };
 }
 
