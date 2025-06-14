@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,18 +27,19 @@ interface MarketModalProps {
   onTrade: (type: string, quantity: number, isBuy: boolean) => void;
   balance: number;
   cargo: { type: string; amount: number }[];
+  prices: { Wheat: number; Olives: number; Copper: number };
 }
 
-const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance, cargo }) => {
+const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance, cargo, prices }) => {
   const [type, setType] = useState("Wheat");
   const [quantity, setQuantity] = useState(0);
   const [isBuy, setIsBuy] = useState(true);
 
-  const price = MOCK_PRICES[type as keyof typeof MOCK_PRICES];
+  const price = prices[type as keyof typeof prices];
   const cargoAmount = cargo.find(g => g.type === type)?.amount || 0;
   const maxAffordable = isBuy
     ? Math.floor(balance / price)
-    : cargoAmount; // <-- use player's actual amount when selling
+    : cargoAmount;
 
   function handleTrade() {
     if (quantity > 0 && quantity <= maxAffordable) {

@@ -21,6 +21,7 @@ const Index = () => {
     cargo,
     bank,
     cargoForHeader,
+    prices,
 
     // Modal states
     marketOpen,
@@ -84,6 +85,7 @@ const Index = () => {
         onTrade={handleMarketTrade}
         balance={balance}
         cargo={cargo}
+        prices={prices}
       />
       <BankModal
         open={bankOpen}

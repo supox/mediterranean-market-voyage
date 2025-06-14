@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { generatePrices } from "@/utils/pricing";
 
 const INITIAL_BALANCE = 5000;
 const INITIAL_CARGO = [
@@ -20,6 +21,9 @@ export function useGameLogic() {
   const [balance, setBalance] = useState(INITIAL_BALANCE);
   const [cargo, setCargo] = useState([...INITIAL_CARGO]);
   const [bank, setBank] = useState(0);
+
+  // New: Market prices for current country (regenerates on sail)
+  const [prices, setPrices] = useState(generatePrices());
 
   // Modal states
   const [marketOpen, setMarketOpen] = useState(false);
@@ -54,17 +58,8 @@ export function useGameLogic() {
 
   // Actions
   function handleMarketTrade(type: string, quantity: number, isBuy: boolean) {
-    const price = isBuy
-      ? type === "Wheat"
-        ? 9
-        : type === "Olives"
-        ? 25
-        : 55
-      : type === "Wheat"
-      ? 8
-      : type === "Olives"
-      ? 22
-      : 52;
+    const price = prices[type as keyof typeof prices]; // Use current price!
+
     if (isBuy) {
       setBalance((b) => b - price * quantity);
       setCargo((prev) => {
@@ -110,6 +105,8 @@ export function useGameLogic() {
         : null;
     setCountry(dest);
     setWeather(getRandomWeather());
+    setPrices(generatePrices()); // <-- New: update prices per port/country!
+
     if (travelDays >= 1) {
       advanceTime("long");
     } else {
@@ -212,5 +209,6 @@ export function useGameLogic() {
     isGameOver,
     maxDeposit: balance,
     maxWithdraw: bank,
+    prices, // <- Supply market prices for use in MarketModal!
   };
 }
