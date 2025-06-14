@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,8 +31,7 @@ const countryImages: { [key: string]: string } = {
   Israel: "/lovable-uploads/bb13a525-8f06-4c12-92fb-2a415ea252d7.webp",
   Egypt: "/lovable-uploads/23ac5e36-2a0e-4ee3-9659-01a0cbe024f9.webp",
   Cyprus: "/lovable-uploads/781a783b-a9f8-4000-8e62-da2386ccc29d.webp",
-  Greece: "/lovable-uploads/32d9486a-456f-47f3-aaa7-2926ac272e2b.webp", // <-- New Greek market image
-  // Add more here as you upload for other countries
+  Greece: "/lovable-uploads/32d9486a-456f-47f3-aaa7-2926ac272e2b.webp",
 };
 
 const MarketModal: React.FC<MarketModalProps> = ({
