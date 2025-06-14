@@ -9,7 +9,7 @@ import PricesTable from "@/components/PricesTable";
 import MapMed from "@/components/MapMed";
 import DefendShipsModal from "@/components/DefendShipsModal";
 import { useGameLogic } from "@/hooks/useGameLogic";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 
 // Main game page, using extracted logic and focused components
@@ -81,12 +81,24 @@ const Index = () => {
     travelTime?: number;
   }>({ open: false });
 
+  // Ref to always have the latest value for callback
+  const pendingSailRef = useRef<{
+    open: boolean;
+    dest?: string;
+    travelTime?: number;
+  }>({ open: false });
+  // Whenever state updates, keep ref in sync
+  function updatePendingSail(next: { open: boolean; dest?: string; travelTime?: number }) {
+    setPendingSail(next);
+    pendingSailRef.current = next;
+  }
+
   function openSailFlow() {
-    setPendingSail({ open: true });
+    updatePendingSail({ open: true });
   }
 
   function handleDestinationSelected(dest: string, travelTime: number) {
-    setPendingSail({ open: true, dest, travelTime });
+    updatePendingSail({ open: true, dest, travelTime });
     setDefendShipsModalOpen(true);
   }
 
@@ -94,9 +106,10 @@ const Index = () => {
     setDefendShips(numShips, shipPrice);
     setDefendShipsModalOpen(false);
     setTimeout(() => {
-      if (pendingSail.dest && pendingSail.travelTime !== undefined) {
-        handleSail(pendingSail.dest, pendingSail.travelTime);
-        setPendingSail({ open: false }); // Clear after journey begins
+      const { dest, travelTime } = pendingSailRef.current;
+      if (dest && travelTime !== undefined) {
+        handleSail(dest, travelTime);
+        updatePendingSail({ open: false });
       }
     }, 200); // show sail modal after closing defend modal
   }
@@ -196,7 +209,7 @@ const Index = () => {
         open={defendShipsModalOpen}
         onClose={() => {
           setDefendShipsModalOpen(false);
-          setPendingSail({ open: false });
+          updatePendingSail({ open: false });
         }}
         balance={balance}
         cargoValue={cargoValue}
@@ -204,7 +217,7 @@ const Index = () => {
       />
       <SailModal
         open={pendingSail.open && !defendShipsModalOpen}
-        onClose={() => setPendingSail({ open: false })}
+        onClose={() => updatePendingSail({ open: false })}
         currentCountry={country}
         currentHour={currentHour}
         onDestinationSelected={handleDestinationSelected}
