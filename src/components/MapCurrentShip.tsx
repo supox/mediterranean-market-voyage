@@ -32,7 +32,7 @@ const MapCurrentShip: React.FC<MapCurrentShipProps> = ({ country, onClick }) => 
         }}
       >
         <img
-          src="/lovable-uploads/65af5864-7834-4eda-8f8c-a0f7e4772f3d.png"
+          src="/lovable-uploads/65af5864-7834-4eda-8f8c-a0f7e4772f3d.webp"
           alt="Mediterranean map"
           style={{
             objectFit: "cover",
