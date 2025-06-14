@@ -57,7 +57,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
         disabled={disabled}
       >
         <Clock size={34} className="mb-2 text-gray-600" />
-        <span className="font-semibold text-lg">נח עד מחר</span>
+        <span className="font-semibold text-lg">לנוח עד למחרת</span>
       </button>
     </div>
   );
