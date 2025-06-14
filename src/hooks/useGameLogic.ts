@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { Wheat, Coins } from "lucide-react";
 
 const INITIAL_BALANCE = 5000;
 const INITIAL_CARGO = [
@@ -161,22 +159,19 @@ export function useGameLogic() {
     setBank(0);
   }
 
-  // Calculate goods for header
+  // Calculate goods for header (no JSX!)
   const cargoForHeader = [
     {
       type: "Wheat" as const,
       amount: cargoGood("Wheat").amount,
-      icon: <Wheat size={16} className="text-amber-500" />,
     },
     {
       type: "Olives" as const,
       amount: cargoGood("Olives").amount,
-      icon: <Coins size={16} className="text-green-600" />,
     },
     {
       type: "Copper" as const,
       amount: cargoGood("Copper").amount,
-      icon: <Coins size={16} className="text-orange-700" />,
     },
   ];
 

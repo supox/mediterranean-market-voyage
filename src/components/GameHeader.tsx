@@ -1,8 +1,7 @@
-
 import { Banknote, MapPin, Ship, Clock, Sun, CloudRain, Wheat, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Good = { type: "Wheat" | "Olives" | "Copper"; amount: number; icon: JSX.Element; };
+type Good = { type: "Wheat" | "Olives" | "Copper"; amount: number };
 
 const countryFlags: Record<string, string> = {
   Turkey: "🇹🇷",
@@ -80,7 +79,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         <div className="flex gap-1">
           {cargo.map((good) => (
             <span key={good.type} className="bg-white border border-blue-100 rounded-full px-2 py-0.5 flex items-center gap-1 text-sm shadow-sm">
-              {<GoodIcon name={good.type} />}
+              <GoodIcon name={good.type} />
               <span className={cn(
                 "font-semibold",
                 good.type === "Wheat" && "text-amber-700",
