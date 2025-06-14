@@ -20,8 +20,8 @@ export function useCargoExpansion({ balance, shipCapacity, setShipCapacity }: {
       if (balance < 6000) {
         return;
       }
-      // 20% chance
-      if (Math.random() < 0.2) {
+      // 40% chance (increased from 20%)
+      if (Math.random() < 0.4) {
         const minPrice = 5000;
         // Price is 30% of balance, but capped at 90% of balance and not less than minPrice
         const proposedPrice = Math.floor(Math.max(minPrice, balance * 0.3));
