@@ -30,7 +30,7 @@ export function useMarketTrade({
           return [...prev, { type, amount: quantity }];
         }
       });
-      toast({ title: "Trade Complete", description: `Bought ${quantity} ${type}` });
+      toast({ title: "עסקה הושלמה", description: `רכשת ${quantity} ${getTypeLabel(type)}.` });
     } else {
       setBalance((b) => b + price * quantity);
       setCargo((prev) =>
@@ -38,10 +38,25 @@ export function useMarketTrade({
           g.type === type ? { ...g, amount: Math.max(0, g.amount - quantity) } : g
         )
       );
-      toast({ title: "Trade Complete", description: `Sold ${quantity} ${type}` });
+      toast({ title: "עסקה הושלמה", description: `מכרת ${quantity} ${getTypeLabel(type)}.` });
     }
   }
+
+  function getTypeLabel(type: string): string {
+    switch (type) {
+      case "Wheat":
+        return "חיטה";
+      case "Olives":
+        return "זיתים";
+      case "Copper":
+        return "נחושת";
+      default:
+        return type;
+    }
+  }
+
   return {
     handleMarketTrade
   };
 }
+

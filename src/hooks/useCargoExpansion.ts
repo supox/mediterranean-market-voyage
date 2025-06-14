@@ -37,7 +37,10 @@ export function useCargoExpansion({ balance, shipCapacity, setShipCapacity }: {
   function acceptCargoExpansion() {
     if (cargoExpansionOffer) {
       setShipCapacity(cargoExpansionOffer.newCapacity);
-      toast({ title: "Cargo Expanded!", description: `Your ship can now hold up to ${cargoExpansionOffer.newCapacity} tons.` });
+      toast({
+        title: "הרחבת המטען הצליחה!",
+        description: `הספינה שלך יכולה להכיל כעת עד ${cargoExpansionOffer.newCapacity} טון.`
+      });
       setCargoExpansionOffer(null);
       setCargoExpansionModalOpen(false);
     }
@@ -56,4 +59,3 @@ export function useCargoExpansion({ balance, shipCapacity, setShipCapacity }: {
     declineCargoExpansion,
   };
 }
-
