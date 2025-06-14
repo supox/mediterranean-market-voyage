@@ -56,14 +56,19 @@ const Index = () => {
     maxWithdraw,
   } = useGameLogic();
 
-  // Provide a function to handle event option and to close modal (resume sailing)
+  // For pirate and all events: 
+  // onSelect returns outcome, modal shows it, 
+  // after OK, parent closes event modal & resumes sailing
   function onEventSelect(val: string) {
+    // The outcome gets shown inside EventModal; we do NOT close yet!
     handleEventOption(val);
-    resumeSailing();
+    // Do not resumeSailing or close modal here; only do it after OK
   }
 
   function onEventClose() {
+    // When user clicks OK in modal, this handler closes and resumes
     resumeSailing();
+    setEventOpen(false); // closes EventModal
   }
 
   return (

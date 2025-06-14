@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Ship, Flag, MessageSquare, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +10,7 @@ interface EventModalProps {
   description: string;
   options?: { label: string; value: string }[];
   onClose: () => void;
-  onSelectOption?: (val: string) => string | void; // now returns string outcome if present
+  onSelectOption?: (val: string) => string | void;
 }
 
 // Icon fallback map
@@ -30,41 +31,49 @@ const EventModal: React.FC<EventModalProps> = ({
   onClose,
   onSelectOption,
 }) => {
+  // outcome is string | null. If present, we show the outcome instead of the query/options
   const [outcome, setOutcome] = useState<string | null>(null);
 
-  // Reset outcome when modal reopens
+  // Reset outcome when modal opens/closes
   useEffect(() => {
     if (!open) setOutcome(null);
   }, [open]);
 
+  // This handles the user's event option pick, e.g., escape, negotiate, fight
   function handleOption(val: string) {
     let result: string | void = undefined;
     if (onSelectOption) {
       result = onSelectOption(val);
     }
+    // If a string is returned, show outcome, otherwise close modally immediately
     if (typeof result === "string" && result.length > 0) {
       setOutcome(result);
     } else {
-      // If no feedback, just close (should not happen)
+      // Can't happen in our current flow, but safety fallback
       onClose();
     }
   }
 
+  // This handles the OK click after outcome; closes the modal and lets parent resume
   function handleOk() {
-    setOutcome(null);
+    setOutcome(null); // cleanup visual state
     onClose();
-    // journey will continue from parent onClose logic!
   }
+
+  // Pirate event: show always the pirate image and custom title/message
+  const isPirate = type === "Pirate";
+  const eventTitle = isPirate ? "Pirates attack" : (type ? `${type} Event` : "Event");
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md flex flex-col items-center">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 justify-center w-full">
-            {ICONS[type] || <Flag size={28} />} {type ? type + " Event" : "Event"}
+            {isPirate ? <Flag size={32} className="text-red-600" /> : (ICONS[type] || <Flag size={28} />)}
+            {eventTitle}
           </DialogTitle>
         </DialogHeader>
-        {type === "Pirate" && (
+        {isPirate && (
           <img
             src={PIRATE_IMAGE_SRC}
             alt="Pirate encounter"
@@ -73,20 +82,21 @@ const EventModal: React.FC<EventModalProps> = ({
             draggable={false}
           />
         )}
-        {/* Show outcome if present, otherwise show the prompt/options */}
+        {/* Outcome phase: show big text + OK */}
         {outcome ? (
-          <div className="flex flex-col items-center justify-center w-full py-7">
+          <div className="flex flex-col items-center justify-center w-full py-8">
             <div className="text-lg font-semibold text-center mb-6">{outcome}</div>
-            <Button className="mt-2 w-32" onClick={handleOk}>
+            <Button className="mt-2 w-36" onClick={handleOk}>
               OK
             </Button>
           </div>
         ) : (
           <>
+            {/* Story description */}
             <div className="my-2 text-base text-center w-full">{description}</div>
-            {options && (
+            {options && options.length > 0 && (
               <div className="flex flex-col gap-2 mt-4 w-full items-center">
-                {options.map(opt => (
+                {options.map((opt) => (
                   <Button
                     key={opt.value}
                     className="w-40"
