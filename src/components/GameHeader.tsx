@@ -74,7 +74,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
       <div className="flex items-center gap-5">
         <span className="flex items-center gap-1 text-green-700 font-bold text-lg">
           <Banknote size={19} />
-          {balance.toLocaleString()} NIS
+          {balance.toLocaleString()} ₪
         </span>
         <div className="flex gap-1">
           {cargo.map((good) => (

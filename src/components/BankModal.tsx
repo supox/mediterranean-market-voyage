@@ -63,8 +63,8 @@ const BankModal: React.FC<BankModalProps> = ({
           />
           <span className="text-xs text-gray-400">
             {activeTab === "deposit"
-              ? `Available: ${maxDeposit.toLocaleString()} ₤`
-              : `In Bank: ${maxWithdraw.toLocaleString()} ₤`}
+              ? `Available: ${maxDeposit.toLocaleString()} ₪`
+              : `In Bank: ${maxWithdraw.toLocaleString()} ₪`}
           </span>
         </div>
         <button
@@ -72,7 +72,7 @@ const BankModal: React.FC<BankModalProps> = ({
           disabled={amount < 1 || (activeTab === "deposit" ? amount > maxDeposit : amount > maxWithdraw)}
           onClick={handleBank}
         >
-          {activeTab === "deposit" ? "Deposit" : "Withdraw"} {amount > 0 && amount} ₤
+          {activeTab === "deposit" ? "Deposit" : "Withdraw"} {amount > 0 && amount} ₪
         </button>
       </DialogContent>
     </Dialog>

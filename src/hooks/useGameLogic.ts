@@ -94,11 +94,11 @@ export function useGameLogic() {
     if (type === "deposit") {
       setBalance((b) => b - amount);
       setBank((bk) => bk + amount);
-      toast({ description: `Deposited ${amount} NIS` });
+      toast({ description: `Deposited ${amount} ₪` });
     } else {
       setBalance((b) => b + amount);
       setBank((bk) => bk - amount);
-      toast({ description: `Withdrew ${amount} NIS` });
+      toast({ description: `Withdrew ${amount} ₪` });
     }
     advanceTime("short");
   }
