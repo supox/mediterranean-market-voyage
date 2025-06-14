@@ -1,4 +1,3 @@
-
 import React from "react";
 import MapMed from "./MapMed";
 
@@ -35,7 +34,10 @@ const MapAnimationContainer: React.FC<MapAnimationContainerProps> = ({
         mapShouldFadeOut ? "animate-fade-out" : ""
       }`}
     >
-      <h3 className="font-bold text-blue-800 text-lg flex items-center gap-2 mb-2 text-right justify-end">
+      <h3
+        className="font-bold text-blue-800 text-lg flex items-center gap-2 mb-2 text-right justify-end"
+        dir="rtl"
+      >
         <span>
           🧭 הספינה מפליגה מ
           <span className="font-semibold mx-1">
@@ -67,4 +69,3 @@ const MapAnimationContainer: React.FC<MapAnimationContainerProps> = ({
 };
 
 export default MapAnimationContainer;
-
