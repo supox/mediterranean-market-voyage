@@ -44,8 +44,10 @@ export function useEventHandlers({
     setCargo(updatedCargo);
 
     // Create description of what was lost
-    const lostItems = cargoLost.map(item => `${item.amount} tons of ${item.type}`).join(", ");
-    const description = `A violent storm hits your ship! Cargo is thrown overboard to keep the ship stable. You lose ${lostItems}.`;
+    const lostItems = cargoLost.map(
+      item => `${item.amount} טון של ${translateGoodType(item.type)}`
+    ).join(", ");
+    const description = `סערה עזה פוקדת את הספינה! מטען נזרק לים כדי לשמור על יציבותה. איבדת ${lostItems}.`;
     
     // Show storm result without options
     setEventData({
@@ -67,7 +69,7 @@ export function useEventHandlers({
     const availableSpace = shipCapacity - totalCargo;
 
     if (availableSpace <= 0) {
-      const description = `You discover a fleet of deserted ships, but your cargo hold is full! You have to leave the potential salvage behind.`;
+      const description = "גילית צי אוניות נטושות, אך תא המטען שלך מלא! לא ניתן לקחת כלום.";
       setEventData({ type: "Deserted Ships", description, options: [] });
       setEventOpen(true);
       sailingLogic.pauseSailing();
@@ -77,7 +79,7 @@ export function useEventHandlers({
     const destination = sailingLogic.sailing?.to;
     if (!destination) {
       console.error("Sailing destination not found for deserted ships event");
-      const description = `You spot deserted ships, but strong currents prevent you from getting close. You continue your journey.`;
+      const description = "אתה מבחין באוניות נטושות, אך זרמים חזקים מונעים ממך להגיע אליהן. ההפלגה ממשיכה.";
       setEventData({ type: "Deserted Ships", description, options: [] });
       setEventOpen(true);
       sailingLogic.pauseSailing();
@@ -91,7 +93,7 @@ export function useEventHandlers({
 
     if (!price || price <= 0) {
       console.error(`Price for ${randomType} in ${destination} not found or is zero.`);
-      const description = `The deserted ships seem to have been picked clean. You find nothing of value.`;
+      const description = "האוניות הנטושות כבר נבזזו לחלוטין. לא נמצא דבר יקר ערך.";
       setEventData({ type: "Deserted Ships", description, options: [] });
       setEventOpen(true);
       sailingLogic.pauseSailing();
@@ -102,7 +104,7 @@ export function useEventHandlers({
     gainAmount = Math.min(gainAmount, availableSpace);
 
     if (gainAmount <= 0) {
-      const description = `You discover a fleet of deserted ships. After a search, you find some supplies but no significant cargo to add to your hold.`;
+      const description = "מצאת אוניות נטושות, אך לאחר חיפוש יסודי לא מצאתה מטען משמעותי להוסיף.";
       setEventData({ type: "Deserted Ships", description, options: [] });
       setEventOpen(true);
       sailingLogic.pauseSailing();
@@ -120,7 +122,7 @@ export function useEventHandlers({
       }
     });
 
-    const description = `You discover a fleet of deserted ships drifting in the waters. After searching through them, you salvage ${gainAmount} tons of ${randomType} from their cargo holds.`;
+    const description = `אתה מגלה צי אוניות נטושות שנסחפות בים. לאחר חיפוש, שללת ${gainAmount} טון של ${translateGoodType(randomType)} מתאי המטען שלהן.`;
 
     setEventData({
       type: "Deserted Ships",
@@ -147,11 +149,11 @@ export function useEventHandlers({
     let desc = "";
     let options = [];
     if (risk === "Pirate") {
-      desc = "Pirate ships approach! Will you try to Escape, Negotiate, or Fight Back?";
+      desc = "ספינות שודדי ים מתקרבות! האם תנסה לברוח, לנהל משא ומתן או להילחם?";
       options = [
-        { label: "Escape", value: "escape" },
-        { label: "Negotiate", value: "negotiate" },
-        { label: "Fight Back", value: "fight" },
+        { label: "ברח", value: "escape" },
+        { label: "משא ומתן", value: "negotiate" },
+        { label: "הילחם", value: "fight" },
       ];
     }
     
@@ -170,7 +172,7 @@ export function useEventHandlers({
       // Each defend ship slightly increases escape success chance
       const chance = 0.45 + (sailingLogic.sailing?.risk === "Pirate" ? 0.07 : 0);
       if (Math.random() < chance) {
-        desc = "You escape using clever maneuvers and your hired escorts!";
+        desc = "הצלחת להימלט בעזרת תמרונים חכמים והליווי ששכרת!";
       } else {
         // Pirates catch up — update logic to take 30%-80% of cargo
         const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
@@ -178,7 +180,7 @@ export function useEventHandlers({
           // If no cargo, lose coins instead
           const coinLoss = 200 + Math.floor(Math.random() * 300); // 200-500 coins
           setBalance(b => Math.max(0, b - coinLoss));
-          desc = `You failed to escape. The pirates catch up and, finding no goods, demand ${coinLoss} ₪.`;
+          desc = `נכשלת בבריחה. השודדים תופסים אותך ודורשים כופר בסך ${coinLoss} ₪.`;
         } else {
           // Pirates take 30-80% of all cargo, at least 1 ton
           const lossPercent = 0.3 + Math.random() * 0.5; // 30% to 80%
@@ -211,11 +213,11 @@ export function useEventHandlers({
           setCargo(updatedCargo);
           // Format the loot message
           if (cargoLost.length === 1) {
-            lostCargoMessage = `${cargoLost[0].amount} tons of ${cargoLost[0].type}`;
+            lostCargoMessage = `${cargoLost[0].amount} טון של ${translateGoodType(cargoLost[0].type)}`;
           } else if (cargoLost.length > 1) {
-            lostCargoMessage = cargoLost.map(x => `${x.amount} ${x.type}`).join(", ");
+            lostCargoMessage = cargoLost.map(x => `${x.amount} ${translateGoodType(x.type)}`).join(", ");
           }
-          desc = `You failed to escape. The pirates catch up and steal ${lostCargoMessage} from your cargo hold!`;
+          desc = `נכשלת בבריחה. השודדים השיגו אותך וגנבו ${lostCargoMessage} ממטענך!`;
         }
       }
     }
@@ -225,9 +227,9 @@ export function useEventHandlers({
         // No cargo to give, pay coins instead
         const coinLoss = 150 + Math.floor(Math.random() * 200); // 150-350 coins
         setBalance(b => Math.max(0, b - coinLoss));
-        desc = `You have no cargo to offer, so you pay ${coinLoss} ₪ as tribute. The pirates let you go.`;
+        desc = `אין לך מטען להציע, אז אתה משלם לשודדים מס בסך ${coinLoss} ₪. השודדים נותנים לך להמשיך.`;
       } else {
-        desc = `You accept paying tribute, losing 1 cargo unit. The pirates let you go.`;
+        desc = "אתה מסכים לשלם מס ולמסור יחידה אחת מכל סוג מטען. השודדים משחררים אותך.";
         setCargo((prev) => {
           // Lose 1 of each type
           return prev.map((good) => {
@@ -242,16 +244,16 @@ export function useEventHandlers({
       if (Math.random() < winChance) {
         const plunder = 350 + Math.floor(Math.random() * 400);
         setBalance((b) => b + plunder);
-        desc = `Battle ensues! Your fleet prevails, and you win, plundering ${plunder} ₪ from the pirates.`;
+        desc = `קרב מתפתח! הצלחת לגבור על השודדים ושללת מהם ${plunder} ₪!`;
       } else {
         const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
         if (totalCargo === 0) {
           // No cargo to lose, pay coins instead
           const coinLoss = 100 + Math.floor(Math.random() * 200); // 100-300 coins
           setBalance(b => Math.max(0, b - coinLoss));
-          desc = `Despite your courage, the pirates overpower you. With no cargo to take, they demand ${coinLoss} ₪.`;
+          desc = `נלחמת בגבורה, אך השודדים ניצחו. לא היה להם מה לשדוד, לכן דרשו ממך ${coinLoss} ₪.`;
         } else {
-          desc = "Despite your courage, the pirates overpower you. You lose 1 cargo unit.";
+          desc = "נלחמת בגבורה, אך השודדים גברו עליך. איבדת יחידה אחת מכל סוג מטען.";
           setCargo((prev) => {
             // Lose 1 of each type
             return prev.map((good) => {
@@ -278,7 +280,7 @@ export function useEventHandlers({
           return good;
         })
       );
-      desc = `In the chaos, you throw ${toLose} cargo units overboard to keep the ship afloat. You survive the storm.`;
+      desc = `בסערה נאלצת לזרוק לים ${toLose} יחידות מטען כדי לייצב את הספינה. שרדת את הסערה.`;
     }
     if (val === "brave") {
       // If current weather is Stormy, risk is higher
@@ -299,13 +301,27 @@ export function useEventHandlers({
           })
         );
         desc = stormy
-          ? "The storm batters your ship! You lose a large portion of your cargo but survive."
-          : "After a tense struggle, some cargo is lost but you make it through.";
+          ? "הסערה מכה בספינה! איבדת חלק גדול מהמטען, אך ניצלת."
+          : "מאבק עיקש מול הסערה. למרות אובדן המטען, הספינה שורדת.";
       } else {
-        desc = "You bravely endure the storm and come out unscathed!";
+        desc = "הצלחת לעבור את הסערה בשלום!";
       }
     }
     return desc;
+  }
+
+  // Utility for translation
+  function translateGoodType(type: string): string {
+    switch (type) {
+      case "Wheat":
+        return "חיטה";
+      case "Olives":
+        return "זיתים";
+      case "Copper":
+        return "נחושת";
+      default:
+        return type;
+    }
   }
 
   return {
