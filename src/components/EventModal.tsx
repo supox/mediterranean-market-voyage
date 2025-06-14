@@ -20,10 +20,12 @@ const ICONS: Record<string, JSX.Element> = {
   Navigation: <Ship size={32} className="text-sky-600" />,
   Storm: <MessageSquare size={32} className="text-blue-400" />,
   Treasure: <Coins size={32} className="text-amber-500" />,
+  "Deserted Ships": <Ship size={32} className="text-amber-600" />,
 };
 
 const PIRATE_IMAGE_SRC = "/lovable-uploads/c79ea32b-8d77-4a6d-8804-990b2720a110.png";
 const STORM_IMAGE_SRC = "/lovable-uploads/8d527de1-872d-4a7d-a0e5-8d10f5547081.png";
+const DESERTED_SHIPS_IMAGE_SRC = "/lovable-uploads/a0ebda64-da54-4745-9d53-5f5e720af3d2.png";
 
 const EventModal: React.FC<EventModalProps> = ({
   open,
@@ -59,10 +61,13 @@ const EventModal: React.FC<EventModalProps> = ({
 
   const isPirate = type === "Pirate";
   const isStorm = type === "Storm";
+  const isDesertedShips = type === "Deserted Ships";
   const eventTitle = isPirate
     ? "Pirates attack"
     : isStorm
     ? "Storm at Sea"
+    : isDesertedShips
+    ? "Deserted Ships"
     : type
     ? `${type} Event`
     : "Event";
@@ -76,6 +81,8 @@ const EventModal: React.FC<EventModalProps> = ({
               <Flag size={32} className="text-red-600" />
             ) : isStorm ? (
               <MessageSquare size={32} className="text-blue-400" />
+            ) : isDesertedShips ? (
+              <Ship size={32} className="text-amber-600" />
             ) : (
               ICONS[type] || <Flag size={28} />
             )}
@@ -96,6 +103,15 @@ const EventModal: React.FC<EventModalProps> = ({
             src={STORM_IMAGE_SRC}
             alt="Storm at sea"
             className="w-full rounded-lg shadow mb-3 border border-blue-600"
+            style={{ maxHeight: 180, objectFit: "cover" }}
+            draggable={false}
+          />
+        )}
+        {isDesertedShips && (
+          <img
+            src={DESERTED_SHIPS_IMAGE_SRC}
+            alt="Deserted ships"
+            className="w-full rounded-lg shadow mb-3 border border-amber-600"
             style={{ maxHeight: 180, objectFit: "cover" }}
             draggable={false}
           />

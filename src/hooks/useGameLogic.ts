@@ -214,6 +214,12 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
       return;
     }
     
+    if (risk === "Deserted Ships") {
+      // Handle deserted ships automatically without user options
+      handleDesertedShipsEvent();
+      return;
+    }
+    
     let desc = "";
     let options = [];
     if (risk === "Pirate") {
@@ -271,6 +277,36 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
       type: "Storm",
       description,
       options: [], // No options for storm
+    });
+    setEventOpen(true);
+    sailingLogic.pauseSailing();
+  }
+
+  function handleDesertedShipsEvent() {
+    // Random cargo gain (1-3 tons of random goods)
+    const cargoTypes = ["Wheat", "Olives", "Copper"];
+    const randomType = cargoTypes[Math.floor(Math.random() * cargoTypes.length)];
+    const gainAmount = 1 + Math.floor(Math.random() * 3); // 1-3 tons
+    
+    // Add cargo to player's inventory
+    setCargo((prev) => {
+      const found = prev.find((g) => g.type === randomType);
+      if (found) {
+        return prev.map((g) =>
+          g.type === randomType ? { ...g, amount: g.amount + gainAmount } : g
+        );
+      } else {
+        return [...prev, { type: randomType, amount: gainAmount }];
+      }
+    });
+
+    const description = `You discover a fleet of deserted ships drifting in the waters. After searching through them, you salvage ${gainAmount} tons of ${randomType} from their cargo holds.`;
+    
+    // Show deserted ships result without options
+    setEventData({
+      type: "Deserted Ships",
+      description,
+      options: [], // No options for deserted ships
     });
     setEventOpen(true);
     sailingLogic.pauseSailing();

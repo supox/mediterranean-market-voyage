@@ -19,8 +19,8 @@ const GameEventHandler: React.FC<GameEventHandlerProps> = ({
   onEventSelect,
   onEventClose,
 }) => {
-  // For storms with no options, just show OK button
-  const isStormWithoutOptions = eventData.type === "Storm" && (!eventData.options || eventData.options.length === 0);
+  // For storms and deserted ships with no options, just show OK button
+  const isEventWithoutOptions = (eventData.type === "Storm" || eventData.type === "Deserted Ships") && (!eventData.options || eventData.options.length === 0);
 
   return (
     <EventModal
@@ -29,8 +29,8 @@ const GameEventHandler: React.FC<GameEventHandlerProps> = ({
       description={eventData.description}
       options={eventData.options}
       onClose={onEventClose}
-      onSelectOption={isStormWithoutOptions ? undefined : onEventSelect}
-      showOkButton={isStormWithoutOptions}
+      onSelectOption={isEventWithoutOptions ? undefined : onEventSelect}
+      showOkButton={isEventWithoutOptions}
     />
   );
 };

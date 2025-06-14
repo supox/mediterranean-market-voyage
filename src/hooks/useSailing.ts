@@ -41,13 +41,16 @@ export function useSailing({
     }
     
     // Calculate risk probabilities
-    const pirateChance = currentHour >= 18 ? 0.4 : 0.3; // 40% at night, 30% during day
+    const pirateChance = currentHour >= 18 ? 0.3 : 0.2; // 30% at night, 20% during day
     
-    // Storm chance is 0 if no cargo, otherwise 25%
+    // Storm chance is 0 if no cargo, otherwise 20%
     const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
-    const stormChance = totalCargo > 0 ? 0.25 : 0;
+    const stormChance = totalCargo > 0 ? 0.2 : 0;
     
-    const totalEventChance = pirateChance + stormChance;
+    // Deserted ships chance is 15%
+    const desertedShipsChance = 0.15;
+    
+    const totalEventChance = pirateChance + stormChance + desertedShipsChance;
     
     let risk = null;
     if (Math.random() < totalEventChance) {
@@ -55,8 +58,10 @@ export function useSailing({
       const eventRoll = Math.random() * totalEventChance;
       if (eventRoll < pirateChance) {
         risk = "Pirate";
-      } else {
+      } else if (eventRoll < pirateChance + stormChance) {
         risk = "Storm";
+      } else {
+        risk = "Deserted Ships";
       }
     }
     
