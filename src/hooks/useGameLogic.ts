@@ -82,7 +82,8 @@ export function useGameLogic() {
       );
       toast({ title: "Trade Complete", description: `Sold ${quantity} ${type}` });
     }
-    advanceTime("short");
+    // Time does NOT advance when trading at the market
+    // advanceTime("short");
   }
 
   function handleBankAction(type: "deposit" | "withdraw", amount: number) {
@@ -95,7 +96,8 @@ export function useGameLogic() {
       setBank((bk) => bk - amount);
       toast({ description: `Withdrew ${amount} ₪` });
     }
-    advanceTime("short");
+    // Time does NOT advance when depositing or withdrawing at the bank
+    // advanceTime("short");
   }
 
   function handleSail(dest: string, travelDays: number) {
