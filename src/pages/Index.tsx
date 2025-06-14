@@ -1,3 +1,4 @@
+
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -82,10 +83,9 @@ const Index = () => {
   // For pirate and all events: 
   // onSelect returns outcome, modal shows it, 
   // after OK, parent closes event modal & resumes sailing
-  function onEventSelect(val: string) {
-    // The outcome gets shown inside EventModal; we do NOT close yet!
-    handleEventOption(val);
-    // Do not resumeSailing or close modal here; only do it after OK
+  function onEventSelect(val: string): string | void {
+    // Pass outcome BACK to modal so it shows outcome before closing.
+    return handleEventOption(val);
   }
 
   function onEventClose() {
@@ -193,10 +193,11 @@ const Index = () => {
         description={eventData.description}
         options={eventData.options}
         onClose={onEventClose}
-        onSelectOption={onEventSelect}
+        onSelectOption={onEventSelect} {/* <-- now returns string to modal */}
       />
     </div>
   );
 };
 
 export default Index;
+
