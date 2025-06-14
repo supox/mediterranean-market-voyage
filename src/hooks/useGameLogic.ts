@@ -95,13 +95,37 @@ export function useGameLogic() {
     setDefendShipCost(0);
   }
 
+  // Implement advanceTime function for handling time and days
+  function advanceTime(param: number | "rest") {
+    if (param === "rest") {
+      // Next day, morning
+      setDay((prev) => prev + 1);
+      setCurrentHour(DAY_START_HOUR);
+      // Regenerate prices for a new day
+      setPricesByCountry(generatePricesForAllCountries(["Israel", "Turkey", "Greece", "Cyprus", "Egypt"]));
+    } else {
+      // Advance in-game clock by that many hours (e.g. hours spent sailing)
+      setCurrentHour((prev) => {
+        // Calculate if day should increment
+        const nextHour = prev + param;
+        if (nextHour > DAY_END_HOUR) {
+          // Move to next day and carry over extra hours (rarely needed)
+          setDay((d) => d + 1);
+          setPricesByCountry(generatePricesForAllCountries(["Israel", "Turkey", "Greece", "Cyprus", "Egypt"]));
+          return DAY_START_HOUR + (nextHour - DAY_END_HOUR);
+        }
+        return nextHour;
+      });
+    }
+  }
+
   // Use sailing logic, and clear defend ships when journey ends
   const sailingLogic = useSailing({
     country,
     currentHour,
     setCountry,
     setWeather,
-    advanceTime,
+    advanceTime, // <-- now will be in scope and valid
     setSailOpen,
     afterFinish: clearDefendShips, // callback after sailing ends
   });
