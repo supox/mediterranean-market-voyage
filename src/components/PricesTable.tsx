@@ -13,7 +13,8 @@ interface PricesTableProps {
   country: string;
 }
 
-const COUNTRIES = ["Israel", "Turkey", "Egypt"];
+// Change: country order is now Turkey, Israel, Egypt
+const COUNTRIES = ["Turkey", "Israel", "Egypt"];
 const GOODS = [
   { name: "Wheat", emoji: "🌾", hebrew: "חיטה" },
   { name: "Olives", emoji: "🫒", hebrew: "זיתים" },
@@ -63,3 +64,4 @@ export default function PricesTable({ pricesByCountry, country }: PricesTablePro
     </div>
   );
 }
+
