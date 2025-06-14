@@ -1,6 +1,4 @@
 
-// Utility for reproducible prices in the correct ranges, always matching the specified step
-
 const PRICE_RANGE = {
   Wheat: { min: 35, max: 300, step: 5 },
   Olives: { min: 250, max: 750, step: 10 },
@@ -20,9 +18,9 @@ export function generatePricesForCountry() {
   };
 }
 
-// Returns prices for all countries in the format { [country]: {good: price, ...}, ... }
+// Only generate prices for Egypt, Israel, Turkey by default
 export function generatePricesForAllCountries(
-  countries: string[] = ["Israel", "Turkey", "Greece", "Cyprus", "Egypt"]
+  countries: string[] = ["Israel", "Turkey", "Egypt"]
 ) {
   const result: Record<string, { Wheat: number; Olives: number; Copper: number }> = {};
   for (const country of countries) {
@@ -30,4 +28,3 @@ export function generatePricesForAllCountries(
   }
   return result;
 }
-

@@ -1,5 +1,4 @@
 
-
 import {
   Table,
   TableHeader,
@@ -14,7 +13,8 @@ interface PricesTableProps {
   country: string;
 }
 
-const COUNTRIES = ["Israel", "Turkey", "Greece", "Cyprus", "Egypt"];
+// Only show current countries in the game
+const COUNTRIES = ["Israel", "Turkey", "Egypt"];
 const GOODS = [
   { name: "Wheat", emoji: "🌾" },
   { name: "Olives", emoji: "🫒" },
@@ -66,4 +66,3 @@ export default function PricesTable({ pricesByCountry, country }: PricesTablePro
     </div>
   );
 }
-

@@ -4,20 +4,18 @@ import { Map } from "lucide-react";
 import { useState } from "react";
 import MapMed from "./MapMed";
 
+// Only the 3 main countries remain
 const DESTS = [
   { name: "Turkey", flag: "🇹🇷" },
   { name: "Israel", flag: "🇮🇱" },
-  { name: "Greece", flag: "🇬🇷" },
-  { name: "Cyprus", flag: "🇨🇾" },
   { name: "Egypt", flag: "🇪🇬" },
 ];
 
+// Only allowed routes (user can *not* cross over directly from Turkey <-> Egypt except as allowed).
 const ROUTES: Record<string, Record<string, number>> = {
-  Egypt: { Israel: 0.5, Turkey: 1, Greece: 999, Cyprus: 999, Egypt: 0 },
-  Israel: { Egypt: 0.5, Turkey: 0.5, Cyprus: 0.104, Greece: 1, Israel: 0 },
-  Turkey: { Israel: 0.5, Egypt: 1, Cyprus: 999, Greece: 999, Turkey: 0 },
-  Cyprus: { Israel: 0.104, Egypt: 999, Turkey: 999, Greece: 999, Cyprus: 0 },
-  Greece: { Israel: 1, Egypt: 999, Turkey: 999, Cyprus: 999, Greece: 0 },
+  Egypt: { Israel: 0.5, Turkey: 1, Egypt: 0 },
+  Israel: { Egypt: 0.5, Turkey: 0.5, Israel: 0 },
+  Turkey: { Israel: 0.5, Egypt: 1, Turkey: 0 },
 };
 
 function formatTravelTime(days: number) {
@@ -28,8 +26,6 @@ function formatTravelTime(days: number) {
 interface SailModalProps {
   open: boolean;
   onClose: () => void;
-  // Remove old onSail, use onDestinationSelected for new flow
-  // onSail: (country: string, time: number) => void;
   currentCountry: string;
   currentHour?: number;
   onDestinationSelected?: (dest: string, travelTime: number) => void;
@@ -51,7 +47,7 @@ const SailModal: React.FC<SailModalProps> = ({
   const destinations = DESTS.filter((d) => {
     if (d.name === currentCountry) return false;
     const route = ROUTES[currentCountry][d.name];
-    if (route === 999) return false;
+    if (route === undefined || route === 999) return false;
     const travelHours = Math.round(route * 12);
     if (currentHour + travelHours > DEFAULT_END_HOUR) return false;
     return true;
@@ -62,6 +58,7 @@ const SailModal: React.FC<SailModalProps> = ({
     .filter((d) => {
       if (
         d.name === currentCountry ||
+        ROUTES[currentCountry][d.name] === undefined ||
         ROUTES[currentCountry][d.name] === 999
       )
         return true;
@@ -72,7 +69,7 @@ const SailModal: React.FC<SailModalProps> = ({
     .map((d) => d.name);
 
   const handlePickDestination = () => {
-    if (dest && ROUTES[currentCountry][dest] !== 999 && onDestinationSelected) {
+    if (dest && ROUTES[currentCountry][dest] !== undefined && ROUTES[currentCountry][dest] !== 999 && onDestinationSelected) {
       const travelTime = ROUTES[currentCountry][dest];
       const travelHours = Math.round(travelTime * 12);
       if (currentHour + travelHours > DEFAULT_END_HOUR) return;
@@ -138,4 +135,3 @@ const SailModal: React.FC<SailModalProps> = ({
 };
 
 export default SailModal;
-

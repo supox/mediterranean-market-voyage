@@ -1,3 +1,4 @@
+
 export const INITIAL_BALANCE = 5000;
 export const INITIAL_CARGO = [
   { type: "Wheat", amount: 0 },
@@ -5,7 +6,7 @@ export const INITIAL_CARGO = [
   { type: "Copper", amount: 0 },
 ];
 export const WEATHER_TYPES = ["Sunny", "Stormy", "Overcast"];
-export const COUNTRIES = ["Israel", "Turkey", "Greece", "Cyprus", "Egypt"];
+export const COUNTRIES = ["Israel", "Turkey", "Egypt"];
 export const DAY_START_HOUR = 8;
 export const DAY_END_HOUR = 20;
 

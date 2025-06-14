@@ -1,16 +1,12 @@
 
 export const LOCATIONS = {
   Turkey:  { x: 395, y: 80 },
-  Greece:  { x: 68, y: 82 },
-  Cyprus:  { x: 287, y: 168 },
   Israel:  { x: 347, y: 236 },
   Egypt:   { x: 163, y: 303 },
 };
 
 export const FLAG = {
   Turkey: "🇹🇷",
-  Greece: "🇬🇷",
-  Cyprus: "🇨🇾",
   Israel: "🇮🇱",
   Egypt: "🇪🇬",
 };
