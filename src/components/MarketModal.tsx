@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,7 +28,7 @@ interface MarketModalProps {
 
 const countryImages: { [key: string]: string } = {
   Turkey: "/lovable-uploads/b04ca857-7db0-4cc0-b5f5-5a56f7541f3a.png",
-  Israel: "/lovable-uploads/5fc74a15-7429-49de-92cf-168edb5edf56.png",
+  Israel: "/lovable-uploads/0012a6a2-00dd-4e07-82ed-04430c01a234.png",
   // Add more here as you upload for other countries
 };
 
@@ -58,21 +59,21 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
         <DialogHeader>
           <DialogTitle>{isBuy ? "Buy" : "Sell"} Goods</DialogTitle>
         </DialogHeader>
-        {/* Image for Market popup */}
-        <div className="flex justify-center mb-3">
+        {/* Larger, less-padded Image for Market popup */}
+        <div className="flex justify-center items-center mb-1" style={{ background: "#f2e6c9", borderRadius: 12, minHeight: 0 }}>
           {marketImage ? (
             <img
               src={marketImage}
               alt={`Marketplace in ${country}`}
-              className="w-32 h-32 object-contain rounded-md shadow"
-              style={{ background: "#f2e6c9" }}
+              className="w-60 h-44 object-cover rounded-md shadow border"
+              style={{ margin: 0, padding: 0 }}
             />
           ) : (
             <img
               src="/lovable-uploads/b9972723-2bb9-4b5c-a63c-fff1ab433467.png"
               alt="Marketplace Illustration"
-              className="w-32 h-32 object-contain rounded-md shadow"
-              style={{ background: "#f2e6c9" }}
+              className="w-60 h-44 object-cover rounded-md shadow border"
+              style={{ margin: 0, padding: 0 }}
             />
           )}
         </div>
@@ -133,3 +134,4 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
 }
 
 export default MarketModal;
+
