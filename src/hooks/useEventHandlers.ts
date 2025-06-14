@@ -122,7 +122,13 @@ export function useEventHandlers({
       }
     });
 
-    const description = `אתה מגלה צי אוניות נטושות שנסחפות בים. לאחר חיפוש, שללת ${gainAmount} טון של ${translateGoodType(randomType)} מתאי המטען שלהן.`;
+    // נוסח מתוקן: "אספת" במקום "שללת", גם בלשון רבים/יחיד
+    let description = "";
+    if (gainAmount === 1) {
+      description = `אתה מגלה צי אוניות נטושות שנסחפות בים. לאחר חיפוש, אספת 1 טון של ${translateGoodType(randomType)} מתאי המטען שלהן.`;
+    } else {
+      description = `אתה מגלה צי אוניות נטושות שנסחפות בים. לאחר חיפוש, אספת ${gainAmount} טון של ${translateGoodType(randomType)} מתאי המטען שלהן.`;
+    }
 
     setEventData({
       type: "Deserted Ships",
