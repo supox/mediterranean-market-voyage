@@ -171,8 +171,13 @@ const Index = () => {
         />
       )}
       <div className="max-w-4xl mx-auto flex flex-col items-center justify-center pt-10 pb-12 px-3">
-        <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow">
-          🌊 סוחר הים התיכון
+        <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-6 tracking-tight drop-shadow flex items-center gap-2">
+          <img 
+            src="/lovable-uploads/d4039133-4df2-42a3-95b2-771760ced482.png" 
+            alt="Mediterranean ship" 
+            className="w-8 h-8 md:w-10 md:h-10 object-contain"
+          />
+          סוחר הים התיכון
         </h1>
         {isGameOver ? (
           <GameOver balance={balance} cargo={cargo} onPlayAgain={resetGame} />
