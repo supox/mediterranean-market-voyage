@@ -161,9 +161,10 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     if (eventType === "Navigation Error" && sailingLogic.sailing && sailingLogic.sailing.navErrorTarget) {
       // Special handling: Navigation Error
       const navTarget = sailingLogic.sailing.navErrorTarget;
+      // Hebrew translation for the event description:
       setEventData({
         type: "Navigation Error",
-        description: `Lost at sea! Strong winds and poor navigation send your ship off course... You end up arriving at ${navTarget} instead!`,
+        description: `שגיאה בניווט! רוחות חזקות וניווט לקוי שולחים את הספינה ליעד אחר... הספינה עוגנת ב${navTarget} במקום.`,
         options: [], // No options, just show OK
       });
       setEventOpen(true);
