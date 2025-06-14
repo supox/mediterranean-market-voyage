@@ -22,6 +22,7 @@ const ICONS: Record<string, JSX.Element> = {
 };
 
 const PIRATE_IMAGE_SRC = "/lovable-uploads/c79ea32b-8d77-4a6d-8804-990b2720a110.png";
+const STORM_IMAGE_SRC = "/lovable-uploads/8d527de1-872d-4a7d-a0e5-8d10f5547081.png";
 
 const EventModal: React.FC<EventModalProps> = ({
   open,
@@ -31,45 +32,51 @@ const EventModal: React.FC<EventModalProps> = ({
   onClose,
   onSelectOption,
 }) => {
-  // outcome is string | null. If present, we show the outcome instead of the query/options
   const [outcome, setOutcome] = useState<string | null>(null);
 
-  // Reset outcome when modal opens/closes
   useEffect(() => {
     if (!open) setOutcome(null);
   }, [open]);
 
-  // This handles the user's event option pick, e.g., escape, negotiate, fight
   function handleOption(val: string) {
     let result: string | void = undefined;
     if (onSelectOption) {
       result = onSelectOption(val);
     }
-    // If a string is returned, show outcome, otherwise close modally immediately
     if (typeof result === "string" && result.length > 0) {
       setOutcome(result);
     } else {
-      // Can't happen in our current flow, but safety fallback
       onClose();
     }
   }
 
-  // This handles the OK click after outcome; closes the modal and lets parent resume
   function handleOk() {
-    setOutcome(null); // cleanup visual state
+    setOutcome(null);
     onClose();
   }
 
-  // Pirate event: show always the pirate image and custom title/message
   const isPirate = type === "Pirate";
-  const eventTitle = isPirate ? "Pirates attack" : (type ? `${type} Event` : "Event");
+  const isStorm = type === "Storm";
+  const eventTitle = isPirate
+    ? "Pirates attack"
+    : isStorm
+    ? "Storm at Sea"
+    : type
+    ? `${type} Event`
+    : "Event";
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md flex flex-col items-center">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 justify-center w-full">
-            {isPirate ? <Flag size={32} className="text-red-600" /> : (ICONS[type] || <Flag size={28} />)}
+            {isPirate ? (
+              <Flag size={32} className="text-red-600" />
+            ) : isStorm ? (
+              <MessageSquare size={32} className="text-blue-400" />
+            ) : (
+              ICONS[type] || <Flag size={28} />
+            )}
             {eventTitle}
           </DialogTitle>
         </DialogHeader>
@@ -82,7 +89,15 @@ const EventModal: React.FC<EventModalProps> = ({
             draggable={false}
           />
         )}
-        {/* Outcome phase: show big text + OK */}
+        {isStorm && (
+          <img
+            src={STORM_IMAGE_SRC}
+            alt="Storm at sea"
+            className="w-full rounded-lg shadow mb-3 border border-blue-600"
+            style={{ maxHeight: 180, objectFit: "cover" }}
+            draggable={false}
+          />
+        )}
         {outcome ? (
           <div className="flex flex-col items-center justify-center w-full py-8">
             <div className="text-lg font-semibold text-center mb-6">{outcome}</div>
@@ -92,7 +107,6 @@ const EventModal: React.FC<EventModalProps> = ({
           </div>
         ) : (
           <>
-            {/* Story description */}
             <div className="my-2 text-base text-center w-full">{description}</div>
             {options && options.length > 0 && (
               <div className="flex flex-col gap-2 mt-4 w-full items-center">
@@ -116,3 +130,4 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
+

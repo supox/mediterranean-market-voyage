@@ -217,6 +217,13 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string) => void 
         { label: "Fight Back", value: "fight" },
       ];
     }
+    if (risk === "Storm") {
+      desc = "A violent storm hits your ship! Do you throw cargo overboard to stabilize, or try to brave the storm?";
+      options = [
+        { label: "Throw Cargo Overboard", value: "throw" },
+        { label: "Brave the Storm", value: "brave" },
+      ];
+    }
     // Add more types if needed
     setEventData({
       type: risk,
@@ -265,6 +272,50 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string) => void 
       } else {
         desc = "Despite your courage, the pirates overpower you. You lose some cargo.";
         setCargo((prev) => prev.map(g => ({ ...g, amount: Math.max(0, g.amount - 1) })));
+      }
+    }
+    // --- STORM LOGIC ---
+    if (val === "throw") {
+      // Always lose 2-3 units (random), distributed among cargo
+      const toLose = 2 + Math.floor(Math.random() * 2); // 2 or 3
+      // Shuffle type order for some randomness
+      const goodTypes = ["Wheat", "Olives", "Copper"].sort(() => Math.random() - 0.5);
+      let left = toLose;
+      setCargo((prev) =>
+        prev.map((good) => {
+          if (left > 0 && good.amount > 0) {
+            const take = Math.min(good.amount, left);
+            left -= take;
+            return { ...good, amount: good.amount - take };
+          }
+          return good;
+        })
+      );
+      desc = `In the chaos, you throw ${toLose} cargo units overboard to keep the ship afloat. You survive the storm.`;
+    }
+    if (val === "brave") {
+      // If current weather is Stormy, risk is higher
+      const stormy = weather === "Stormy";
+      const lossChance = stormy ? 0.85 : 0.55;
+      if (Math.random() < lossChance) {
+        // Lose 3-5 units
+        let toLose = 3 + Math.floor(Math.random() * 3); // 3,4,5
+        const goodTypes = ["Wheat", "Olives", "Copper"].sort(() => Math.random() - 0.5);
+        setCargo((prev) =>
+          prev.map((good) => {
+            if (toLose > 0 && good.amount > 0) {
+              const take = Math.min(good.amount, toLose);
+              toLose -= take;
+              return { ...good, amount: good.amount - take };
+            }
+            return good;
+          })
+        );
+        desc = stormy
+          ? "The storm batters your ship! You lose a large portion of your cargo but survive."
+          : "After a tense struggle, some cargo is lost but you make it through.";
+      } else {
+        desc = "You bravely endure the storm and come out unscathed!";
       }
     }
     return desc;
