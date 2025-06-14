@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { generatePrices } from "@/utils/pricing";
 
+// Game constants
 const INITIAL_BALANCE = 5000;
 const INITIAL_CARGO = [
   { type: "Wheat", amount: 0 },
@@ -9,20 +11,29 @@ const INITIAL_CARGO = [
   { type: "Copper", amount: 0 },
 ];
 const WEATHER_TYPES = ["Sunny", "Stormy", "Overcast"];
+const DAY_START_HOUR = 8;
+const DAY_END_HOUR = 20;
 
+// Helper to get random weather
 const getRandomWeather = () =>
   WEATHER_TYPES[Math.floor(Math.random() * WEATHER_TYPES.length)];
 
+// Helper to format time as "HH:00"
+function formatTime(hour: number) {
+  return hour.toString().padStart(2, "0") + ":00";
+}
+
 export function useGameLogic() {
   const [day, setDay] = useState(1);
-  const [timeOfDay, setTimeOfDay] = useState("Morning");
+  // Instead of "Morning", "Midday", etc., use hour (integer, 8 - 20 inclusive)
+  const [currentHour, setCurrentHour] = useState(DAY_START_HOUR);
   const [country, setCountry] = useState("Israel");
   const [weather, setWeather] = useState(getRandomWeather());
   const [balance, setBalance] = useState(INITIAL_BALANCE);
   const [cargo, setCargo] = useState([...INITIAL_CARGO]);
   const [bank, setBank] = useState(0);
 
-  // New: Market prices for current country (regenerates on sail)
+  // Market prices for current country (regenerates on sail)
   const [prices, setPrices] = useState(generatePrices());
 
   // Modal states
@@ -40,25 +51,33 @@ export function useGameLogic() {
   const cargoGood = (type: string) =>
     cargo.find((g) => g.type === type) || { type, amount: 0 };
 
-  // Handle daily time
-  function advanceTime(amount: "short" | "long" | "rest") {
-    const order = ["Morning", "Midday", "Evening", "Night"];
-    let idx = order.indexOf(timeOfDay);
-    if (amount === "rest" || timeOfDay === "Night") {
+  function advanceTime(hours: number | "rest") {
+    if (hours === "rest") {
       setDay((d) => d + 1);
-      setTimeOfDay("Morning");
+      setCurrentHour(DAY_START_HOUR);
       setWeather(getRandomWeather());
       toast({ description: "A new day dawns over the Mediterranean." });
-    } else if (amount === "short") {
-      setTimeOfDay(order[Math.min(idx + 1, 3)]);
-    } else if (amount === "long") {
-      setTimeOfDay("Night");
+      return;
+    }
+    let newHour = currentHour + hours;
+    let dayIncreased = false;
+    if (newHour >= DAY_END_HOUR) {
+      // Go to next day if gone past 20:00, start at 08:00
+      setDay((d) => d + 1);
+      setCurrentHour(DAY_START_HOUR + (newHour - DAY_END_HOUR));
+      setWeather(getRandomWeather());
+      dayIncreased = true;
+    } else {
+      setCurrentHour(newHour);
+    }
+    if (dayIncreased) {
+      toast({ description: "A new day dawns over the Mediterranean." });
     }
   }
 
   // Actions
   function handleMarketTrade(type: string, quantity: number, isBuy: boolean) {
-    const price = prices[type as keyof typeof prices]; // Use current price!
+    const price = prices[type as keyof typeof prices];
 
     if (isBuy) {
       setBalance((b) => b - price * quantity);
@@ -82,8 +101,7 @@ export function useGameLogic() {
       );
       toast({ title: "Trade Complete", description: `Sold ${quantity} ${type}` });
     }
-    // Time does NOT advance when trading at the market
-    // advanceTime("short");
+    // No time advance for market
   }
 
   function handleBankAction(type: "deposit" | "withdraw", amount: number) {
@@ -96,24 +114,22 @@ export function useGameLogic() {
       setBank((bk) => bk - amount);
       toast({ description: `Withdrew ${amount} ₪` });
     }
-    // Time does NOT advance when depositing or withdrawing at the bank
-    // advanceTime("short");
+    // No time advance for bank
   }
 
+  // Sailing always advances time by travel time in hours, allows multi-leg (e.g. 0.5d = 6hrs)
   function handleSail(dest: string, travelDays: number) {
+    const travelHours = Math.round(travelDays * 12); // 1 d = 12 hours (08:00 -> 20:00), e.g. 0.5 d = 6h
     const risk =
-      Math.random() < (timeOfDay === "Evening" ? 0.18 : 0.1)
+      Math.random() < (currentHour >= 18 ? 0.18 : 0.1)
         ? "Pirate"
         : null;
+
     setCountry(dest);
     setWeather(getRandomWeather());
-    setPrices(generatePrices()); // <-- New: update prices per port/country!
+    setPrices(generatePrices());
+    advanceTime(travelHours);
 
-    if (travelDays >= 1) {
-      advanceTime("long");
-    } else {
-      advanceTime("short");
-    }
     if (risk) {
       setEventData({
         type: "Pirate",
@@ -150,7 +166,7 @@ export function useGameLogic() {
 
   function resetGame() {
     setDay(1);
-    setTimeOfDay("Morning");
+    setCurrentHour(DAY_START_HOUR);
     setCountry("Turkey");
     setWeather(getRandomWeather());
     setBalance(INITIAL_BALANCE);
@@ -176,10 +192,14 @@ export function useGameLogic() {
 
   const isGameOver = day > 7;
 
+  // For header and UI
+  const formattedTime = formatTime(currentHour);
+
   return {
     // Game state
     day,
-    timeOfDay,
+    currentHour,
+    formattedTime,
     country,
     weather,
     balance,
@@ -211,6 +231,8 @@ export function useGameLogic() {
     isGameOver,
     maxDeposit: balance,
     maxWithdraw: bank,
-    prices, // <- Supply market prices for use in MarketModal!
+    prices,
+    dayStartHour: DAY_START_HOUR,
+    dayEndHour: DAY_END_HOUR,
   };
 }
