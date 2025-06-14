@@ -1,6 +1,6 @@
 
 export const LOCATIONS = {
-  Turkey:  { x: 395, y: 80 },
+  Turkey:  { x: 320, y: 140 },
   Israel:  { x: 347, y: 236 },
   Egypt:   { x: 163, y: 303 },
 };
