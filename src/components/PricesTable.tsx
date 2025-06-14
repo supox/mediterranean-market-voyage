@@ -13,7 +13,6 @@ interface PricesTableProps {
   country: string;
 }
 
-// Supported countries and goods (must match game + logic)
 const COUNTRIES = ["Israel", "Turkey", "Greece", "Cyprus", "Egypt"];
 const GOODS = [
   { name: "Wheat", emoji: "🌾" },
@@ -52,7 +51,7 @@ export default function PricesTable({ pricesByCountry, country }: PricesTablePro
                       : "text-center text-gray-600"
                   }
                 >
-                  {pricesByCountry[c][good.name as keyof typeof pricesByCountry[c]].toLocaleString()} ₪
+                  {pricesByCountry[c][good.name as "Wheat" | "Olives" | "Copper"].toLocaleString()} ₪
                 </TableCell>
               ))}
             </TableRow>
