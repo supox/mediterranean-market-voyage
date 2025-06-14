@@ -1,4 +1,3 @@
-
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -15,6 +14,12 @@ import CargoExpansionModal from "@/components/CargoExpansionModal";
 import MapCurrentShip from "@/components/MapCurrentShip";
 import DayStartModal from "@/components/DayStartModal";
 
+const COUNTRY_LABELS: Record<string, string> = {
+  Turkey: "טורקיה",
+  Israel: "ישראל",
+  Egypt: "מצרים",
+};
+
 const Index = () => {
   const [mapShouldFadeOut, setMapShouldFadeOut] = useState(false);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -26,7 +31,7 @@ const Index = () => {
       hasShownSmoothSailingToast.current = true;
       toast({
         title: "הפלגה חלקה!",
-        description: `הפלגת בהצלחה ל${destination} ללא תקלות.`,
+        description: `הפלגת בהצלחה ל${COUNTRY_LABELS[destination] ?? destination} ללא תקלות.`,
       });
       setTimeout(() => {
         setMapShouldFadeOut(true);
