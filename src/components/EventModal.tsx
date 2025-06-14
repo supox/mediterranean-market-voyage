@@ -32,7 +32,7 @@ const HE_TITLES: Record<string, string> = {
   Treasure: "אוצר מוסתר",
 };
 
-const PIRATE_IMAGE_SRC = "/lovable-uploads/91bdce13-7a33-4f9a-b4b9-9c299b5fdb00.png";
+const PIRATE_IMAGE_SRC = "/lovable-uploads/8cc5600b-71af-467c-b270-e5ba1bf4fa20.png";
 const STORM_IMAGE_SRC = "/lovable-uploads/38924e06-f6c4-4785-92a7-54c9a2d9dc1a.png";
 const DESERTED_SHIPS_IMAGE_SRC = "/lovable-uploads/a256e2b9-e4c2-44a4-afd5-8d2f9b50f492.png";
 const NAV_ERROR_IMAGE_SRC = "/lovable-uploads/d8ab874c-c74d-4f7f-8546-efcdded79bc2.png";

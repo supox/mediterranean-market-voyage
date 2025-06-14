@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,7 +45,7 @@ const BankModal: React.FC<BankModalProps> = ({
         </DialogHeader>
         <div className="flex justify-center mb-3">
           <img
-            src="/lovable-uploads/0508b10a-86f6-456a-b1ca-2ae4fb6d8fb7.png"
+            src="/lovable-uploads/f9e7c0ab-4cc9-4a12-ad8c-218d5fa32d0e.png"
             alt="איור בנק מימי הביניים"
             className="w-32 h-32 object-contain rounded-md shadow"
             style={{ background: "#e7dbb2" }}
@@ -105,4 +104,3 @@ const BankModal: React.FC<BankModalProps> = ({
 };
 
 export default BankModal;
-

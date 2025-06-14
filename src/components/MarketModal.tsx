@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,11 +26,11 @@ interface MarketModalProps {
 }
 
 const countryImages: { [key: string]: string } = {
-  Turkey: "/lovable-uploads/555178aa-dd82-4f44-bd57-d4ac8d844432.png",
-  Israel: "/lovable-uploads/267df53a-1764-4fa5-a07e-1e268627d5cc.png",
-  Egypt: "/lovable-uploads/0213cf6c-2d82-4e47-915c-cb2d6d835374.png",
-  Cyprus: "/lovable-uploads/a344e5b0-c4ac-472f-9051-d5dd76e757f5.png",
-  Greece: "/lovable-uploads/a344e5b0-c4ac-472f-9051-d5dd76e757f5.png",
+  Turkey: "/lovable-uploads/6ce58ef6-0bf0-4ddc-8d1a-850b6bcbbc58.png",
+  Israel: "/lovable-uploads/6478bfa7-c4ed-43da-83f1-bea9efc387b2.png",
+  Egypt: "/lovable-uploads/dff27eb7-df59-4f2e-a825-83b43f2606fe.png",
+  Cyprus: "/lovable-uploads/6ce58ef6-0bf0-4ddc-8d1a-850b6bcbbc58.png",
+  Greece: "/lovable-uploads/6478bfa7-c4ed-43da-83f1-bea9efc387b2.png",
 };
 
 const MarketModal: React.FC<MarketModalProps> = ({
@@ -90,7 +89,7 @@ const MarketModal: React.FC<MarketModalProps> = ({
             />
           ) : (
             <img
-              src="/lovable-uploads/a344e5b0-c4ac-472f-9051-d5dd76e757f5.png"
+              src="/lovable-uploads/6ce58ef6-0bf0-4ddc-8d1a-850b6bcbbc58.png"
               alt="איור שוק"
               className="w-60 h-44 object-cover rounded-md shadow border"
               style={{ margin: 0, padding: 0 }}
