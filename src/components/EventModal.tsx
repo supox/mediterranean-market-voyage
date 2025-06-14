@@ -18,6 +18,7 @@ interface EventModalProps {
 const ICONS: Record<string, JSX.Element> = {
   Pirate: <Flag size={32} className="text-red-600" />,
   Navigation: <Ship size={32} className="text-sky-600" />,
+  "Navigation Error": <Ship size={32} className="text-yellow-500" />,
   Storm: <MessageSquare size={32} className="text-blue-400" />,
   Treasure: <Coins size={32} className="text-amber-500" />,
   "Deserted Ships": <Ship size={32} className="text-amber-600" />,
@@ -26,6 +27,7 @@ const ICONS: Record<string, JSX.Element> = {
 const PIRATE_IMAGE_SRC = "/lovable-uploads/c79ea32b-8d77-4a6d-8804-990b2720a110.png";
 const STORM_IMAGE_SRC = "/lovable-uploads/8d527de1-872d-4a7d-a0e5-8d10f5547081.png";
 const DESERTED_SHIPS_IMAGE_SRC = "/lovable-uploads/a0ebda64-da54-4745-9d53-5f5e720af3d2.png";
+const NAV_ERROR_IMAGE_SRC = "/lovable-uploads/fb444440-2f48-4f90-856e-7ecb31c815d1.png";
 
 const EventModal: React.FC<EventModalProps> = ({
   open,
@@ -62,12 +64,15 @@ const EventModal: React.FC<EventModalProps> = ({
   const isPirate = type === "Pirate";
   const isStorm = type === "Storm";
   const isDesertedShips = type === "Deserted Ships";
+  const isNavError = type === "Navigation Error";
   const eventTitle = isPirate
     ? "Pirates attack"
     : isStorm
     ? "Storm at Sea"
     : isDesertedShips
     ? "Deserted Ships"
+    : isNavError
+    ? "Navigation Error"
     : type
     ? `${type} Event`
     : "Event";
@@ -83,6 +88,8 @@ const EventModal: React.FC<EventModalProps> = ({
               <MessageSquare size={32} className="text-blue-400" />
             ) : isDesertedShips ? (
               <Ship size={32} className="text-amber-600" />
+            ) : isNavError ? (
+              <Ship size={32} className="text-yellow-500" />
             ) : (
               ICONS[type] || <Flag size={28} />
             )}
@@ -116,6 +123,15 @@ const EventModal: React.FC<EventModalProps> = ({
             draggable={false}
           />
         )}
+        {isNavError && (
+          <img
+            src={NAV_ERROR_IMAGE_SRC}
+            alt="Navigation error"
+            className="w-full rounded-lg shadow mb-3 border border-yellow-400"
+            style={{ maxHeight: 180, objectFit: "cover" }}
+            draggable={false}
+          />
+        )}
         {outcome ? (
           <div className="flex flex-col items-center justify-center w-full py-8">
             <div className="text-lg font-semibold text-center mb-6">{outcome}</div>
@@ -126,7 +142,7 @@ const EventModal: React.FC<EventModalProps> = ({
         ) : (
           <>
             <div className="my-2 text-base text-center w-full">{description}</div>
-            {showOkButton ? (
+            {showOkButton || isNavError ? (
               <div className="flex flex-col gap-2 mt-4 w-full items-center">
                 <Button className="w-40" onClick={handleOk}>
                   OK
@@ -154,3 +170,4 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
+

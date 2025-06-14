@@ -150,6 +150,25 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
   const formattedTime = formatTime(currentHour);
   const prices = pricesByCountry[country];
 
+  // --- Handle Navigation Error event display ---
+  // hijack eventHandler to show modal & auto-reroute if Navigation Error triggers
+  function triggerEvent(eventType: string) {
+    if (eventType === "Navigation Error" && sailingLogic.sailing && sailingLogic.sailing.navErrorTarget) {
+      // Special handling: Navigation Error
+      const navTarget = sailingLogic.sailing.navErrorTarget;
+      setEventData({
+        type: "Navigation Error",
+        description: `Lost at sea! Strong winds and poor navigation send your ship off course... You end up arriving at ${navTarget} instead!`,
+        options: [], // No options, just show OK
+      });
+      setEventOpen(true);
+      // The rest is handled in onEventClose (Index.tsx will call reroute)
+      return;
+    }
+    // regular event logic
+    eventHandlers.triggerEvent(eventType);
+  }
+
   return {
     // Game state
     day,
@@ -179,7 +198,7 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     handleBankAction,
     handleSail: sailingLogic.startSail,
     finishSail: sailingLogic.finishSail,
-    triggerEvent: eventHandlers.triggerEvent,
+    triggerEvent, // updated to handle Navigation Error
     sailing: sailingLogic.sailing,
     handleEventOption: eventHandlers.handleEventOption,
     handleRest,
@@ -217,5 +236,8 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
       cargoExpansion.acceptCargoExpansion();
     },
     declineCargoExpansion: cargoExpansion.declineCargoExpansion,
+
+    // Also export rerouteToNavErrorTarget so Index.tsx can use it
+    rerouteToNavErrorTarget: sailingLogic.rerouteToNavErrorTarget,
   };
 }

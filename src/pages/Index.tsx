@@ -74,6 +74,7 @@ const Index = () => {
     cargoExpansionOffer,
     acceptCargoExpansion,
     declineCargoExpansion,
+    rerouteToNavErrorTarget,
   } = useGameLogic({
     onSailSuccess: (destination: string, hadEvent: boolean) =>
       handleSailSuccess(destination, hadEvent),
@@ -81,12 +82,8 @@ const Index = () => {
 
   function handleMapMidpoint() {
     if (sailing && sailing.risk && !sailing.hasEventOccurred) {
-      // Pause ship by pausing sailing before triggering event
       if (typeof sailingPaused === 'boolean' && !sailingPaused) {
-        // Pause the sailing animation (so MapMed sees paused === true)
-        // This happens via: pauseSailing, but since sailingLogic.pauseSailing is in useGameLogic,
-        // eventHandlers.triggerEvent already calls pause.
-        // Defensive: leave as is
+        // Event pausing logic remains
       }
       triggerEvent(sailing.risk);
       if (setSailingHasEventOccurred) setSailingHasEventOccurred(true);
@@ -98,9 +95,13 @@ const Index = () => {
   }
 
   function onEventClose() {
-    // Resume sailing animation after modal is closed!
-    resumeSailing();
-    setEventOpen(false);
+    if (sailing && sailing.risk === "Navigation Error" && sailing.navErrorTarget) {
+      rerouteToNavErrorTarget();
+      setEventOpen(false);
+    } else {
+      resumeSailing();
+      setEventOpen(false);
+    }
   }
 
   function handleAnimationEnd() {
