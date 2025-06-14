@@ -1,0 +1,75 @@
+
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
+interface CargoExpansionModalProps {
+  open: boolean;
+  currentCapacity: number;
+  newCapacity: number;
+  price: number;
+  balance: number;
+  onAccept: () => void;
+  onDecline: () => void;
+}
+
+const CargoExpansionModal: React.FC<CargoExpansionModalProps> = ({
+  open,
+  currentCapacity,
+  newCapacity,
+  price,
+  balance,
+  onAccept,
+  onDecline,
+}) => {
+  return (
+    <Dialog open={open} onOpenChange={onDecline}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-2xl mb-1 text-blue-900 font-bold">
+            Cargo Expansion Offer!
+          </DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col items-center mb-2">
+          <span className="text-5xl mb-2">🚢</span>
+          <p className="text-base text-gray-700 mb-2 text-center">
+            A local shipwright offers to refit your ship for extra cargo capacity!
+            <br />
+            <span className="font-semibold text-slate-800">
+              Double your cargo limit from{" "}
+              <span className="text-blue-700">{currentCapacity} tons</span>{" "}
+              <span className="mx-1">→</span>
+              <span className="text-green-700">{newCapacity} tons</span>
+            </span>
+            <br />
+            For a one-time payment of:
+            <span className="block text-2xl font-bold text-amber-600 mt-2">
+              {price.toLocaleString()} ₪
+            </span>
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 mt-4">
+          <Button
+            className="w-full"
+            variant="default"
+            disabled={balance < price}
+            onClick={onAccept}
+          >
+            Accept Offer
+          </Button>
+          <Button className="w-full" variant="outline" onClick={onDecline}>
+            Decline
+          </Button>
+          {balance < price && (
+            <span className="text-xs text-red-500 text-center">
+              Not enough funds
+            </span>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default CargoExpansionModal;
+

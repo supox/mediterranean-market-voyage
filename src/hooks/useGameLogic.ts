@@ -10,7 +10,7 @@ import {
   getRandomWeather,
   formatTime,
   COUNTRIES,
-  SHIP_CAPACITY,
+  SHIP_CAPACITY as BASE_SHIP_CAPACITY,
 } from "@/utils/gameHelpers";
 import { useSailing } from "./useSailing";
 
@@ -58,6 +58,15 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     options?: { label: string; value: string }[];
   }>({ type: "", description: "", options: [] });
 
+  // Add shipCapacity as state
+  const [shipCapacity, setShipCapacity] = useState(BASE_SHIP_CAPACITY);
+
+  // Cargo Expansion Offer States
+  const [cargoExpansionOffer, setCargoExpansionOffer] = useState<null | { price: number, newCapacity: number }>(null);
+  const [cargoExpansionModalOpen, setCargoExpansionModalOpen] = useState(false);
+  // Keep track: Only offer once per new day
+  const [offerDay, setOfferDay] = useState(1);
+
   // Helper: find cargo good (by type)
   const cargoGood = (type: string) =>
     cargo.find((g) => g.type === type) || { type, amount: 0 };
@@ -76,11 +85,45 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
   const [defendShipsModalOpen, setDefendShipsModalOpen] = useState(false);
   const [defendShipCost, setDefendShipCost] = useState(0);
 
-  // SCORE utility: cargo value computation
+  // Override cargo value calculation to use shipCapacity dynamically where relevant
   const cargoValue = cargo.reduce((acc, cur) => {
     const price = pricesByCountry[country]?.[cur.type] || 0;
     return acc + ((cur.amount || 0) * price);
   }, 0);
+
+  // --- CARGO EXPANSION RANDOM OFFER LOGIC ---
+  // Only offer on new days (except day 1), and only once per day
+  function maybeShowCargoExpansion(newDay: number) {
+    // Only offer on next days, not on first day
+    if (newDay > 1 && offerDay !== newDay) {
+      setOfferDay(newDay);
+      // 20% chance
+      if (Math.random() < 0.2) {
+        // Price is 30% of balance at offer time, min 5000
+        const minPrice = 5000;
+        const calcPrice = Math.floor(Math.max(minPrice, balance * 0.3));
+        const newCapacity = shipCapacity * 2;
+        setCargoExpansionOffer({ price: calcPrice, newCapacity });
+        setCargoExpansionModalOpen(true);
+      }
+    }
+  }
+
+  // Expand ship when accepted and deduct price
+  function acceptCargoExpansion() {
+    if (cargoExpansionOffer) {
+      setShipCapacity(cargoExpansionOffer.newCapacity);
+      setBalance(b => b - cargoExpansionOffer.price);
+      setCargoExpansionOffer(null);
+      setCargoExpansionModalOpen(false);
+      toast({ title: "Cargo Expanded!", description: `Your ship can now hold up to ${cargoExpansionOffer.newCapacity} tons.` });
+    }
+  }
+
+  function declineCargoExpansion() {
+    setCargoExpansionOffer(null);
+    setCargoExpansionModalOpen(false);
+  }
 
   // When player confirms defend ships rental before sailing:
   function setDefendShips(num: number, pricePerShip: number) {
@@ -96,11 +139,15 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     setDefendShipCost(0);
   }
 
-  // Implement advanceTime function for handling time and days
+  // -- Update advanceTime to insert offer logic --
   function advanceTime(param: number | "rest") {
     if (param === "rest") {
       // Next day, morning
-      setDay((prev) => prev + 1);
+      setDay((prev) => {
+        const newDay = prev + 1;
+        maybeShowCargoExpansion(newDay);
+        return newDay;
+      });
       setCurrentHour(DAY_START_HOUR);
       // Regenerate prices for a new day
       setPricesByCountry(generatePricesForAllCountries(["Israel", "Turkey", "Greece", "Cyprus", "Egypt"]));
@@ -111,7 +158,12 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
         const nextHour = prev + param;
         if (nextHour > DAY_END_HOUR) {
           // Move to next day and carry over extra hours (rarely needed)
-          setDay((d) => d + 1);
+          const newDay = prev => prev + 1;
+          setDay((d) => {
+            const newD = d + 1;
+            maybeShowCargoExpansion(newD);
+            return newD;
+          });
           setPricesByCountry(generatePricesForAllCountries(["Israel", "Turkey", "Greece", "Cyprus", "Egypt"]));
           return DAY_START_HOUR + (nextHour - DAY_END_HOUR);
         }
@@ -133,11 +185,17 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     cargo,
   });
 
-  // Actions
+  // Changes in handleMarketTrade: enforce capacity
   function handleMarketTrade(type: string, quantity: number, isBuy: boolean) {
     const price = pricesByCountry[country][type as keyof typeof pricesByCountry[typeof country]];
 
     if (isBuy) {
+      // Enforce cargo capacity dynamically
+      const totalCargo = cargo.reduce((acc, g) => acc + g.amount, 0);
+      if (totalCargo + quantity > shipCapacity) {
+        toast({ title: "Not Enough Room", description: `Ship can only hold ${shipCapacity} tons.` });
+        return;
+      }
       setBalance((b) => b - price * quantity);
       setCargo((prev) => {
         const found = prev.find((g) => g.type === type);
@@ -290,7 +348,7 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     const gainedValue = totalValue * gainPercentage;
 
     const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
-    const availableSpace = SHIP_CAPACITY - totalCargo;
+    const availableSpace = shipCapacity - totalCargo;
 
     if (availableSpace <= 0) {
       const description = `You discover a fleet of deserted ships, but your cargo hold is full! You have to leave the potential salvage behind.`;
@@ -585,6 +643,14 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     cargoValue,
     // Add setSailingHasEventOccurred so it is available to consumers (like Index.tsx)
     setSailingHasEventOccurred: sailingLogic.setSailingHasEventOccurred,
+
+    // New for cargo expansion modal
+    shipCapacity,
+    cargoExpansionModalOpen,
+    setCargoExpansionModalOpen,
+    cargoExpansionOffer,
+    acceptCargoExpansion,
+    declineCargoExpansion,
   };
 }
 
