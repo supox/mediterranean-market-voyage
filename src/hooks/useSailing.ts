@@ -13,11 +13,13 @@ export function useSailing({
   setSailOpen,
   afterFinish, // optional callback after journey end (e.g. to reset defend ships)
 }) {
+  // Extend sailing state to include hasEventOccurred
   const [sailing, setSailingState] = useState<null | {
     from: string;
     to: string;
     travelTime: number;
     risk: string | null;
+    hasEventOccurred?: boolean;
   }>(null);
   const [sailingPaused, setSailingPausedState] = useState(false);
 
@@ -28,9 +30,15 @@ export function useSailing({
       return;
     }
     const risk = Math.random() < (currentHour >= 18 ? 0.7 : 0.5) ? "Pirate" : null;
-    setSailingState({ from: country, to: dest, travelTime: travelDays, risk });
+    setSailingState({ from: country, to: dest, travelTime: travelDays, risk, hasEventOccurred: false });
     setSailingPausedState(false);
     setSailOpen(false);
+  }
+
+  function setSailingHasEventOccurred(val: boolean) {
+    setSailingState(sailing =>
+      sailing ? { ...sailing, hasEventOccurred: val } : sailing
+    );
   }
 
   function pauseSailing() {
@@ -55,5 +63,6 @@ export function useSailing({
     pauseSailing,
     resumeSailing,
     finishSail,
+    setSailingHasEventOccurred,
   };
 }

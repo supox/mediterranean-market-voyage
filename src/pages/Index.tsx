@@ -60,6 +60,7 @@ const Index = () => {
     defendShipsModalOpen,
     setDefendShipsModalOpen,
     cargoValue,
+    setSailingHasEventOccurred,
   } = useGameLogic();
 
   // Intercept sailing: 1. ask about defend ships, then 2. continue to normal sail modal
@@ -82,6 +83,14 @@ const Index = () => {
   // For pirate and all events: 
   // onSelect returns outcome, modal shows it, 
   // after OK, parent closes event modal & resumes sailing
+  function handleMapMidpoint() {
+    if (sailing && sailing.risk && !sailing.hasEventOccurred) {
+      triggerEvent(sailing.risk);
+      // Mark as event occurred
+      if (setSailingHasEventOccurred) setSailingHasEventOccurred(true);
+    }
+  }
+
   function onEventSelect(val: string): string | void {
     // Pass outcome BACK to modal so it shows outcome before closing.
     return handleEventOption(val);
@@ -134,11 +143,7 @@ const Index = () => {
                     duration: 10_000,
                     risk: sailing.risk,
                     paused: sailingPaused,
-                    onMidpoint: () => {
-                      if (sailing.risk) {
-                        triggerEvent(sailing.risk);
-                      }
-                    },
+                    onMidpoint: handleMapMidpoint,
                     onAnimationEnd: () => {
                       finishSail(sailing.to, sailing.travelTime);
                     }
