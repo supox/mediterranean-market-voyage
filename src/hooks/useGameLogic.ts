@@ -361,6 +361,8 @@ export function useGameLogic() {
     setDefendShips,
     defendShips,
     cargoValue,
+    // Add setSailingHasEventOccurred so it is available to consumers (like Index.tsx)
+    setSailingHasEventOccurred: sailingLogic.setSailingHasEventOccurred,
   };
 }
 
