@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,15 +20,19 @@ interface MarketModalProps {
   onClose: () => void;
   onTrade: (type: string, quantity: number, isBuy: boolean) => void;
   balance: number;
+  cargo: { type: string; amount: number }[]; // <-- NEW!
 }
 
-const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance }) => {
+const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balance, cargo }) => {
   const [type, setType] = useState("Wheat");
   const [quantity, setQuantity] = useState(0);
   const [isBuy, setIsBuy] = useState(true);
 
   const price = MOCK_PRICES[type as keyof typeof MOCK_PRICES];
-  const maxAffordable = isBuy ? Math.floor(balance / price) : 99;
+  const cargoAmount = cargo.find(g => g.type === type)?.amount || 0;
+  const maxAffordable = isBuy
+    ? Math.floor(balance / price)
+    : cargoAmount; // <-- use player's actual amount when selling
 
   function handleTrade() {
     if (quantity > 0 && quantity <= maxAffordable) {
@@ -84,7 +87,9 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
             className="w-32"
           />
           <span className="text-xs text-gray-400">
-            {isBuy ? `You can buy up to ${maxAffordable} tons` : `Max sell: ${maxAffordable} tons`}
+            {isBuy
+              ? `You can buy up to ${maxAffordable} tons`
+              : `You can sell up to ${maxAffordable} tons`}
           </span>
         </div>
         <button

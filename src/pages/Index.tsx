@@ -1,4 +1,3 @@
-
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -9,7 +8,7 @@ import GameOver from "@/components/GameOver";
 import { useGameLogic } from "@/hooks/useGameLogic";
 
 // Main game page, using extracted logic and focused components
-export default function Index() {
+const Index = () => {
   const {
     // Game state
     day,
@@ -91,6 +90,7 @@ export default function Index() {
         onClose={() => setMarketOpen(false)}
         onTrade={handleMarketTrade}
         balance={balance}
+        cargo={cargo}
       />
       <BankModal
         open={bankOpen}
@@ -115,4 +115,6 @@ export default function Index() {
       />
     </div>
   );
-}
+};
+
+export default Index;
