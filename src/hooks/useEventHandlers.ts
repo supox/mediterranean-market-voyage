@@ -245,27 +245,78 @@ export function useEventHandlers({
       }
     }
     if (val === "fight") {
-      // Chance/reward scales by defend ships
-      const winChance = 0.18;
+      // New win chance: base 18% + 15% per defend ship (capped at 95%)
+      // More ships = much higher chance, but not 100%
+      const defendShipsCount = sailingLogic.defendShips || 0; // fallback to 0
+      const baseWinChance = 0.18;
+      const shipBonus = 0.15 * defendShipsCount;
+      const winChance = Math.min(0.95, baseWinChance + shipBonus);
+
+      // New REWARD: base 30-50% of user value, reward multiplier ramps up for more ships (nonlinear: x2 per ship after 1)
+      // total value includes goods and bank (not cargo in ship)
+      const totalValue =
+        balance + cargoValue + (typeof sailingLogic.bank === "number" ? sailingLogic.bank : 0);
+      // Reward percent: base random in [0.3, 0.5]
+      const rewardBasePct = 0.3 + Math.random() * 0.2;
+      // Reward multiplier: ships 0 ⇒ x1, 1 ⇒ x2, 2 ⇒ x4, 3 ⇒ x6, 4 ⇒ x8, 5 ⇒ x10 (if allowed)
+      const multiplier = defendShipsCount < 1
+        ? 1
+        : defendShipsCount === 1 ? 2
+        : defendShipsCount === 2 ? 4
+        : defendShipsCount === 3 ? 6
+        : defendShipsCount === 4 ? 8
+        : 10;
+      const plunder = Math.round(totalValue * rewardBasePct * multiplier);
+
+      // On LOSS: Cargo penalty = 10-30% (at least 1). If no cargo, balance loss 10-30% (bank excluded)
+      const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+      const lossPct = 0.1 + Math.random() * 0.2;
+
       if (Math.random() < winChance) {
-        const plunder = 350 + Math.floor(Math.random() * 400);
         setBalance((b) => b + plunder);
-        desc = `קרב מתפתח! הצלחת לגבור על השודדים ושללת מהם ${plunder} ₪!`;
+        desc = `קרב מתפתח! הצלחת לגבור על השודדים ושללת מהם ${plunder.toLocaleString()} ₪!`;
       } else {
-        const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
         if (totalCargo === 0) {
-          // No cargo to lose, pay coins instead
-          const coinLoss = 100 + Math.floor(Math.random() * 200); // 100-300 coins
-          setBalance(b => Math.max(0, b - coinLoss));
-          desc = `נלחמת בגבורה, אך השודדים ניצחו. לא היה להם מה לשדוד, לכן דרשו ממך ${coinLoss} ₪.`;
+          // No cargo to lose, pay coins from balance (not bank)
+          const lostCoins = Math.max(1, Math.round(balance * lossPct));
+          setBalance(b => Math.max(0, b - lostCoins));
+          desc = `נלחמת בגבורה, אך השודדים ניצחו. לא היה לך מה לשדוד, ולכן גנבו ממך ${lostCoins.toLocaleString()} ₪.`;
         } else {
-          desc = "נלחמת בגבורה, אך השודדים גברו עליך. איבדת יחידה אחת מכל סוג מטען.";
-          setCargo((prev) => {
-            // Lose 1 of each type
-            return prev.map((good) => {
-              return good.amount > 0 ? { ...good, amount: good.amount - 1 } : good;
-            });
-          });
+          // Lose 10-30% of *total* cargo, distributed greedily
+          let totalToLose = Math.max(1, Math.floor(totalCargo * lossPct));
+          let lostCargoMessage = "";
+          let updatedCargo = [...cargo];
+          let cargoLost: { type: string, amount: number }[] = [];
+          while (totalToLose > 0) {
+            // More fair: always steal from largest cargo type remaining
+            let maxIndex = -1;
+            let maxAmount = 0;
+            for (let i = 0; i < updatedCargo.length; i++) {
+              if (updatedCargo[i].amount > maxAmount) {
+                maxAmount = updatedCargo[i].amount;
+                maxIndex = i;
+              }
+            }
+            if (maxIndex === -1 || maxAmount === 0) break;
+            const take = Math.min(updatedCargo[maxIndex].amount, totalToLose);
+            if (take > 0) {
+              cargoLost.push({ type: updatedCargo[maxIndex].type, amount: take });
+              updatedCargo[maxIndex] = {
+                ...updatedCargo[maxIndex],
+                amount: updatedCargo[maxIndex].amount - take,
+              };
+              totalToLose -= take;
+            } else {
+              break;
+            }
+          }
+          setCargo(updatedCargo);
+          if (cargoLost.length === 1) {
+            lostCargoMessage = `${cargoLost[0].amount} טון של ${translateGoodType(cargoLost[0].type)}`;
+          } else if (cargoLost.length > 1) {
+            lostCargoMessage = cargoLost.map(x => `${x.amount} ${translateGoodType(x.type)}`).join(", ");
+          }
+          desc = `נלחמת בגבורה, אך השודדים גברו עליך. איבדת ${lostCargoMessage} ממטענך (${Math.round(lossPct * 100)}%)!`;
         }
       }
     }
