@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -94,7 +93,7 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
         </div>
         <div className="flex items-center gap-5 mb-2">
           <Label>Price:</Label>
-          <span className="font-semibold">{price.toLocaleString()} ₤ / ton</span>
+          <span className="font-semibold">{price.toLocaleString()} NIS / ton</span>
         </div>
         <div className="flex gap-3 mb-3">
           <button
@@ -137,4 +136,3 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
 }
 
 export default MarketModal;
-
