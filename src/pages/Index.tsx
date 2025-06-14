@@ -14,8 +14,8 @@ const Index = () => {
   const {
     // Game state
     day,
-    formattedTime, // changed from timeOfDay
-    currentHour, // <--- bring this from useGameLogic to pass down!
+    formattedTime,
+    currentHour,
     country,
     weather,
     balance,
@@ -23,6 +23,7 @@ const Index = () => {
     bank,
     cargoForHeader,
     prices,
+    pricesByCountry,
 
     // Modal states
     marketOpen,
@@ -54,7 +55,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-yellow-50 w-full">
       <GameHeader
         day={Math.min(day, 7)}
-        timeOfDay={formattedTime} // changed from timeOfDay to formattedTime
+        timeOfDay={formattedTime}
         country={country}
         weather={weather}
         balance={balance}
@@ -75,11 +76,10 @@ const Index = () => {
               onRest={handleRest}
               disabled={isGameOver}
             />
-            {/* The ship map for destination picking is now inside the Sail modal */}
           </>
         )}
       </div>
-      <PricesTable prices={prices} country={country} />
+      <PricesTable pricesByCountry={pricesByCountry} country={country} />
       <MarketModal
         open={marketOpen}
         onClose={() => setMarketOpen(false)}

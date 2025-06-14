@@ -9,12 +9,6 @@ function randomPrice(min: number, max: number) {
   return min + rand * 5;
 }
 
-const MOCK_PRICES = {
-  Wheat: randomPrice(35, 200),
-  Olives: randomPrice(70, 400), // Olives are more expensive than Wheat
-  Copper: randomPrice(150, 1000), // Copper is most expensive
-};
-
 const GOODS = [
   { type: "Wheat", icon: "🌾" },
   { type: "Olives", icon: "🫒" },
@@ -27,6 +21,7 @@ interface MarketModalProps {
   onTrade: (type: string, quantity: number, isBuy: boolean) => void;
   balance: number;
   cargo: { type: string; amount: number }[];
+  // CRITICAL: prices for current country for the current day
   prices: { Wheat: number; Olives: number; Copper: number };
 }
 

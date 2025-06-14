@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { generatePrices } from "@/utils/pricing";
+import { generatePricesForAllCountries } from "@/utils/pricing";
 
 // Game constants
 const INITIAL_BALANCE = 5000;
@@ -32,8 +32,8 @@ export function useGameLogic() {
   const [cargo, setCargo] = useState([...INITIAL_CARGO]);
   const [bank, setBank] = useState(0);
 
-  // Market prices for current country (regenerates on sail)
-  const [prices, setPrices] = useState(generatePrices());
+  // Store all country prices for the day
+  const [pricesByCountry, setPricesByCountry] = useState(() => generatePricesForAllCountries(["Israel", "Turkey", "Greece", "Cyprus", "Egypt"]));
 
   // Modal states
   const [marketOpen, setMarketOpen] = useState(false);
@@ -56,6 +56,7 @@ export function useGameLogic() {
       setDay((d) => d + 1);
       setCurrentHour(DAY_START_HOUR);
       setWeather(getRandomWeather());
+      setPricesByCountry(generatePricesForAllCountries(["Israel", "Turkey", "Greece", "Cyprus", "Egypt"])); // <-- Regenerate all prices!
       toast({ description: "A new day dawns over the Mediterranean." });
       return;
     }
@@ -71,7 +72,7 @@ export function useGameLogic() {
 
   // Actions
   function handleMarketTrade(type: string, quantity: number, isBuy: boolean) {
-    const price = prices[type as keyof typeof prices];
+    const price = pricesByCountry[country][type as keyof typeof pricesByCountry[typeof country]];
 
     if (isBuy) {
       setBalance((b) => b - price * quantity);
@@ -111,7 +112,7 @@ export function useGameLogic() {
     // No time advance for bank
   }
 
-  // Sailing always advances time by travel time in hours, allows multi-leg (e.g. 0.5d = 6hrs)
+  // Sailing: do NOT regenerate prices, just move port/country
   function handleSail(dest: string, travelDays: number) {
     const travelHours = Math.round(travelDays * 12);
     // Only sail if arrival is before or at 20:00
@@ -126,8 +127,7 @@ export function useGameLogic() {
 
     setCountry(dest);
     setWeather(getRandomWeather());
-    setPrices(generatePrices());
-    advanceTime(travelHours);
+    advanceTime(Math.round(travelDays * 12));
 
     if (risk) {
       setEventData({
@@ -194,6 +194,9 @@ export function useGameLogic() {
   // For header and UI
   const formattedTime = formatTime(currentHour);
 
+  // CURRENT country's prices for current day:
+  const prices = pricesByCountry[country];
+
   return {
     // Game state
     day,
@@ -230,8 +233,11 @@ export function useGameLogic() {
     isGameOver,
     maxDeposit: balance,
     maxWithdraw: bank,
-    prices,
+    prices, // current country
+    pricesByCountry, // all countries
     dayStartHour: DAY_START_HOUR,
     dayEndHour: DAY_END_HOUR,
   };
 }
+
+// NOTE: This file is now over 240 lines and should be refactored soon!
