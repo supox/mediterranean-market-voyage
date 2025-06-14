@@ -55,9 +55,6 @@ export default function PricesTable() {
           ))}
         </TableBody>
       </Table>
-      <div className="text-xs mt-1 text-center text-muted-foreground">
-        (Prices are static for demo purposes. Actual prices may vary in-game.)
-      </div>
     </div>
   );
 }
