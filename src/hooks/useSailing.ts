@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { getRandomWeather } from "@/utils/gameHelpers";
 import { toast } from "@/hooks/use-toast";
@@ -13,6 +12,7 @@ export function useSailing({
   afterFinish,
   onSailSuccess,
   cargo,
+  shipCapacity,
 }: {
   country: string;
   currentHour: number;
@@ -23,6 +23,7 @@ export function useSailing({
   afterFinish?: () => void;
   onSailSuccess?: (dest: string, hadEvent: boolean) => void;
   cargo: Array<{ type: string; amount: number }>;
+  shipCapacity: number;
 }) {
   const [sailing, setSailingState] = useState<null | {
     from: string;
@@ -35,6 +36,12 @@ export function useSailing({
 
   function startSail(dest: string, travelDays: number) {
     const travelHours = Math.round(travelDays * 12);
+    // NEW: Cargo check before sailing
+    const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+    if (totalCargo > shipCapacity) {
+      toast({ title: "Too Much Cargo", description: `Your ship can only hold ${shipCapacity} tons. Sell or store excess cargo before setting sail.` });
+      return;
+    }
     if (currentHour + travelHours > 20) {
       toast({ title: "Cannot Sail", description: "You can't arrive after 20:00. Please rest until the next day." });
       return;
@@ -44,7 +51,6 @@ export function useSailing({
     const pirateChance = currentHour >= 18 ? 0.3 : 0.2; // 30% at night, 20% during day
     
     // Storm chance is 0 if no cargo, otherwise 20%
-    const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
     const stormChance = totalCargo > 0 ? 0.2 : 0;
     
     // Deserted ships chance is 15%

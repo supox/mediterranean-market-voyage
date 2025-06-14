@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { generatePricesForAllCountries } from "@/utils/pricing";
@@ -84,6 +83,7 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     afterFinish: defendShips.clearDefendShips,
     onSailSuccess: options?.onSailSuccess,
     cargo,
+    shipCapacity, // pass shipCapacity to sailing logic
   });
 
   // Event and market logic into hooks
@@ -102,15 +102,10 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     balance,
   });
 
-  // Market trade logic (still here, as it's short/simple)
+  // Market trade logic - removed ship capacity check here, can exceed capacity
   function handleMarketTrade(type: string, quantity: number, isBuy: boolean) {
     const price = pricesByCountry[country][type as keyof typeof pricesByCountry[typeof country]];
     if (isBuy) {
-      const totalCargo = cargo.reduce((acc, g) => acc + g.amount, 0);
-      if (totalCargo + quantity > shipCapacity) {
-        toast({ title: "Not Enough Room", description: `Ship can only hold ${shipCapacity} tons.` });
-        return;
-      }
       setBalance((b) => b - price * quantity);
       setCargo((prev) => {
         const found = prev.find((g) => g.type === type);
