@@ -5,7 +5,7 @@ import MarketModal from "@/components/MarketModal";
 import BankModal from "@/components/BankModal";
 import GameOver from "@/components/GameOver";
 import PricesTable from "@/components/PricesTable";
-import SailFlow from "@/components/SailFlow";
+import SailFlow, { SailFlowRef } from "@/components/SailFlow";
 import GameEventHandler from "@/components/GameEventHandler";
 import MapAnimationContainer from "@/components/MapAnimationContainer";
 import { useGameLogic } from "@/hooks/useGameLogic";
@@ -16,6 +16,7 @@ const Index = () => {
   const [mapShouldFadeOut, setMapShouldFadeOut] = useState(false);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasShownSmoothSailingToast = useRef(false);
+  const sailFlowRef = useRef<SailFlowRef>(null);
 
   function handleSailSuccess(destination: string, hadEvent: boolean) {
     if (!hadEvent && !hasShownSmoothSailingToast.current) {
@@ -102,6 +103,11 @@ const Index = () => {
     }
   }
 
+  function handleSailButtonClick() {
+    hasShownSmoothSailingToast.current = false;
+    sailFlowRef.current?.openSailFlow();
+  }
+
   React.useEffect(() => {
     return () => {
       if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
@@ -130,9 +136,7 @@ const Index = () => {
               <ActionPanel
                 onMarket={() => setMarketOpen(true)}
                 onBank={() => setBankOpen(true)}
-                onSail={() => {
-                  hasShownSmoothSailingToast.current = false;
-                }}
+                onSail={handleSailButtonClick}
                 onRest={handleRest}
                 disabled={isGameOver}
               />
@@ -168,6 +172,7 @@ const Index = () => {
         maxWithdraw={maxWithdraw}
       />
       <SailFlow
+        ref={sailFlowRef}
         currentCountry={country}
         currentHour={currentHour}
         balance={balance}

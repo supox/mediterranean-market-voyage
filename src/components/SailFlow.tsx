@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import SailModal from "./SailModal";
 import DefendShipsModal from "./DefendShipsModal";
 
@@ -12,14 +12,18 @@ interface SailFlowProps {
   onDefendShips: (numShips: number, shipPrice: number) => void;
 }
 
-const SailFlow: React.FC<SailFlowProps> = ({
+export interface SailFlowRef {
+  openSailFlow: () => void;
+}
+
+const SailFlow = forwardRef<SailFlowRef, SailFlowProps>(({
   currentCountry,
   currentHour,
   balance,
   cargoValue,
   onSail,
   onDefendShips,
-}) => {
+}, ref) => {
   const [sailModalOpen, setSailModalOpen] = useState(false);
   const [defendShipsModalOpen, setDefendShipsModalOpen] = useState(false);
   const [pendingSail, setPendingSail] = useState<{
@@ -43,6 +47,11 @@ const SailFlow: React.FC<SailFlowProps> = ({
     updatePendingSail({ open: true });
     setSailModalOpen(true);
   }
+
+  // Expose the openSailFlow function via ref
+  useImperativeHandle(ref, () => ({
+    openSailFlow,
+  }));
 
   function handleDestinationSelected(dest: string, travelTime: number) {
     console.log("[handleDestinationSelected] called with", { dest, travelTime });
@@ -100,7 +109,9 @@ const SailFlow: React.FC<SailFlowProps> = ({
       />
     </>
   );
-};
+});
+
+SailFlow.displayName = "SailFlow";
 
 export { SailFlow, type SailFlowProps };
 export default SailFlow;
