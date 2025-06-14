@@ -14,13 +14,22 @@ import { toast } from "@/hooks/use-toast";
 
 // Main game page, using extracted logic and focused components
 const Index = () => {
-  // SAIL SUCCESS TOAST HANDLER
+  // SAIL SUCCESS TOAST HANDLER - now also triggers fade out
   function handleSailSuccess(destination: string, hadEvent: boolean) {
     if (!hadEvent) {
       toast({
         title: "Smooth Sailing!",
         description: `You sailed to ${destination} with no incidents.`,
       });
+      // Start fade-out animation for the map.
+      setMapShouldFadeOut(true);
+      // We'll finish the sailing and UI after the fade-out duration (0.5s)
+      fadeTimeoutRef.current = setTimeout(() => {
+        setMapShouldFadeOut(false); // Clean up for next time
+        if (sailing && typeof sailing.to === "string" && typeof sailing.travelTime === "number") {
+          finishSail(sailing.to, sailing.travelTime);
+        }
+      }, 500);
     }
   }
 
@@ -150,6 +159,19 @@ const Index = () => {
     setEventOpen(false); // closes EventModal
   }
 
+  // For fade-out animation of map after smooth sailing
+  const [mapShouldFadeOut, setMapShouldFadeOut] = useState(false);
+
+  // This ref helps us avoid calling finishSail twice
+  const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Defensive: clear fade timer on unmount
+  React.useEffect(() => {
+    return () => {
+      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-yellow-50 w-full">
       <GameHeader
@@ -180,24 +202,38 @@ const Index = () => {
             )}
             {/* When sailing, show the animated map */}
             {sailing && (
-              <div className="w-full max-w-xl mx-auto border bg-white/90 rounded-xl shadow-lg p-4 animate-fade-in">
+              <div
+                className={`w-full max-w-xl mx-auto border bg-white/90 rounded-xl shadow-lg p-4 animate-fade-in ${
+                  mapShouldFadeOut ? "opacity-0 transition-opacity duration-500 pointer-events-none" : "opacity-100 transition-opacity duration-500"
+                }`}
+              >
                 <h3 className="font-bold text-blue-800 text-lg flex items-center gap-2 mb-2">
-                  <span>🧭 Sailing from <span className="font-semibold">{sailing.from}</span> to <span className="font-semibold">{sailing.to}</span>...</span>
+                  <span>
+                    🧭 Sailing from{" "}
+                    <span className="font-semibold">{sailing.from}</span> to{" "}
+                    <span className="font-semibold">{sailing.to}</span>...
+                  </span>
                 </h3>
                 <MapMed
                   animateShip={{
                     from: sailing.from,
                     to: sailing.to,
-                    duration: 5_000, // Changed from 10_000 to 5_000 (5 seconds)
+                    duration: 5000,
                     risk: sailing.risk,
                     paused: sailingPaused,
                     onMidpoint: handleMapMidpoint,
                     onAnimationEnd: () => {
-                      finishSail(sailing.to, sailing.travelTime);
-                    }
+                      // If we already did smooth sailing, the fade will finishSail after animation is done
+                      // so here, only trigger finishSail if fade was NOT triggered
+                      if (!mapShouldFadeOut) {
+                        finishSail(sailing.to, sailing.travelTime);
+                      }
+                    },
                   }}
                 />
-                <div className="text-blue-700 mt-2 text-center text-sm font-medium">The ship is at sea. Please wait...</div>
+                <div className="text-blue-700 mt-2 text-center text-sm font-medium">
+                  The ship is at sea. Please wait...
+                </div>
               </div>
             )}
           </>
