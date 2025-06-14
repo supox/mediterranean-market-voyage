@@ -300,16 +300,26 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
       } else {
         // Each defend ship reduces the pirates' leverage, possibly lowering loss
         const lostGoods = Math.max(1, 3 - defendShips);
-        desc = `You accept paying tribute, losing ${lostGoods} cargo units. The pirates let you go.`;
-        // Remove goods
-        setCargo((prev) => {
-          let toRemove = lostGoods;
-          return prev.map(good =>
-            toRemove > 0 && good.amount > 0
-              ? { ...good, amount: Math.max(0, good.amount - (toRemove-- > 0 ? 1 : 0)) }
-              : good
-          );
+        
+        // Calculate specific cargo loss before updating state
+        let cargoLost: Array<{ type: string; amount: number }> = [];
+        const updatedCargo = cargo.map(good => {
+          if (lostGoods > 0 && good.amount > 0) {
+            const lostAmount = Math.min(good.amount, lostGoods);
+            if (lostAmount > 0) {
+              cargoLost.push({ type: good.type, amount: lostAmount });
+              return { ...good, amount: good.amount - lostAmount };
+            }
+          }
+          return good;
         });
+        
+        // Update cargo state
+        setCargo(updatedCargo);
+        
+        // Create description of what was lost
+        const lostItems = cargoLost.map(item => `${item.amount} tons of ${item.type}`).join(", ");
+        desc = `You accept paying tribute, losing ${lostItems}. The pirates let you go.`;
       }
     }
     if (val === "fight") {
