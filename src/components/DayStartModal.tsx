@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Dialog,
@@ -52,7 +53,7 @@ const DayStartModal: React.FC<DayStartModalProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-xs flex flex-col items-center animate-fade-in pt-4">
         <img
-          src="/lovable-uploads/d7086654-ee76-4b8e-8f73-989a18c0eff3.png"
+          src="/lovable-uploads/a1a344db-7ea2-4be7-ba26-f3dcc3e050dc.png"
           alt="סוחר מתחיל יום חדש"
           className="rounded-lg w-[180px] h-[120px] object-cover mb-2 shadow-md"
           draggable={false}

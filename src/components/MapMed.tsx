@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { LOCATIONS, FLAG, getCurve } from "@/utils/mapConfig";
 import MapShip from "./MapShip";
@@ -173,7 +174,7 @@ const MapMed = (props: any) => {
         }}
       >
         <img
-          src="/lovable-uploads/65af5864-7834-4eda-8f8c-a0f7e4772f3d.png"
+          src="/lovable-uploads/460ee089-eb39-4153-a1ef-63e3e97094e9.png"
           alt="Mediterranean map"
           className="absolute left-0 top-0 w-full h-full object-cover select-none pointer-events-none"
           style={{ zIndex: 0 }}

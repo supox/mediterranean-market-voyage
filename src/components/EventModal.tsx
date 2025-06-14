@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Ship, Flag, MessageSquare, Coins } from "lucide-react";
@@ -31,10 +32,10 @@ const HE_TITLES: Record<string, string> = {
   Treasure: "אוצר מוסתר",
 };
 
-const PIRATE_IMAGE_SRC = "/lovable-uploads/c79ea32b-8d77-4a6d-8804-990b2720a110.png";
-const STORM_IMAGE_SRC = "/lovable-uploads/8d527de1-872d-4a7d-a0e5-8d10f5547081.png";
-const DESERTED_SHIPS_IMAGE_SRC = "/lovable-uploads/a0ebda64-da54-4745-9d53-5f5e720af3d2.png";
-const NAV_ERROR_IMAGE_SRC = "/lovable-uploads/fb444440-2f48-4f90-856e-7ecb31c815d1.png";
+const PIRATE_IMAGE_SRC = "/lovable-uploads/91bdce13-7a33-4f9a-b4b9-9c299b5fdb00.png";
+const STORM_IMAGE_SRC = "/lovable-uploads/38924e06-f6c4-4785-92a7-54c9a2d9dc1a.png";
+const DESERTED_SHIPS_IMAGE_SRC = "/lovable-uploads/a256e2b9-e4c2-44a4-afd5-8d2f9b50f492.png";
+const NAV_ERROR_IMAGE_SRC = "/lovable-uploads/d8ab874c-c74d-4f7f-8546-efcdded79bc2.png";
 
 const EventModal: React.FC<EventModalProps> = ({
   open,
