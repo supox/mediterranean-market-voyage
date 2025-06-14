@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,7 +80,7 @@ const MarketModal: React.FC<MarketModalProps> = ({
           <DialogTitle className="w-full text-center">{isBuy ? "קנה סחורה" : "מכור סחורה"}</DialogTitle>
         </DialogHeader>
         {/* Larger, less-padded Image for Market popup */}
-        <div className="flex justify-center items-center mb-1" style={{ background: "#f2e6c9", borderRadius: 12, minHeight: 0 }}>
+        <div className="flex justify-center items-center mb-1" style={{ borderRadius: 12, minHeight: 0 }}>
           {marketImage ? (
             <img
               src={marketImage}
