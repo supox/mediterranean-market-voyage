@@ -1,4 +1,3 @@
-
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -7,6 +6,7 @@ import SailModal from "@/components/SailModal";
 import EventModal from "@/components/EventModal";
 import GameOver from "@/components/GameOver";
 import PricesTable from "@/components/PricesTable";
+import MapMed from "@/components/MapMed";
 import { useGameLogic } from "@/hooks/useGameLogic";
 
 // Main game page, using extracted logic and focused components
@@ -76,6 +76,8 @@ const Index = () => {
             {/* Removed the Tip section here */}
           </>
         )}
+        {/* Map of Mediterranean with ship at current location */}
+        <MapMed country={country} />
       </div>
       <PricesTable />
       <MarketModal
@@ -111,4 +113,3 @@ const Index = () => {
 };
 
 export default Index;
-
