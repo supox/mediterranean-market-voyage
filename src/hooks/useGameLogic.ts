@@ -244,21 +244,36 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
         desc = "You escape using clever maneuvers and your hired escorts!";
       } else {
         desc = "Despite your best efforts, pirates catch up. Brace for battle!";
+        // If no cargo, lose coins instead
+        const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+        if (totalCargo === 0) {
+          const coinLoss = 200 + Math.floor(Math.random() * 300); // 200-500 coins
+          setBalance(b => Math.max(0, b - coinLoss));
+          desc += ` You pay ${coinLoss} coins to the pirates.`;
+        }
       }
     }
     if (val === "negotiate") {
-      // Each defend ship reduces the pirates' leverage, possibly lowering loss
-      const lostGoods = Math.max(1, 3 - defendShips);
-      desc = `You accept paying tribute, losing ${lostGoods} cargo units. The pirates let you go.`;
-      // Remove goods
-      setCargo((prev) => {
-        let toRemove = lostGoods;
-        return prev.map(good =>
-          toRemove > 0 && good.amount > 0
-            ? { ...good, amount: Math.max(0, good.amount - (toRemove-- > 0 ? 1 : 0)) }
-            : good
-        );
-      });
+      const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+      if (totalCargo === 0) {
+        // No cargo to give, pay coins instead
+        const coinLoss = 150 + Math.floor(Math.random() * 200); // 150-350 coins
+        setBalance(b => Math.max(0, b - coinLoss));
+        desc = `You have no cargo to offer, so you pay ${coinLoss} coins as tribute. The pirates let you go.`;
+      } else {
+        // Each defend ship reduces the pirates' leverage, possibly lowering loss
+        const lostGoods = Math.max(1, 3 - defendShips);
+        desc = `You accept paying tribute, losing ${lostGoods} cargo units. The pirates let you go.`;
+        // Remove goods
+        setCargo((prev) => {
+          let toRemove = lostGoods;
+          return prev.map(good =>
+            toRemove > 0 && good.amount > 0
+              ? { ...good, amount: Math.max(0, good.amount - (toRemove-- > 0 ? 1 : 0)) }
+              : good
+          );
+        });
+      }
     }
     if (val === "fight") {
       // Chance/reward scales by defend ships
@@ -271,7 +286,15 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
         desc = `Battle ensues! Your fleet prevails, and you win, plundering ${plunder} coins from the pirates.`;
       } else {
         desc = "Despite your courage, the pirates overpower you. You lose some cargo.";
-        setCargo((prev) => prev.map(g => ({ ...g, amount: Math.max(0, g.amount - 1) })));
+        const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+        if (totalCargo === 0) {
+          // No cargo to lose, pay coins instead
+          const coinLoss = 100 + Math.floor(Math.random() * 200); // 100-300 coins
+          setBalance(b => Math.max(0, b - coinLoss));
+          desc += ` With no cargo to take, they demand ${coinLoss} coins.`;
+        } else {
+          setCargo((prev) => prev.map(g => ({ ...g, amount: Math.max(0, g.amount - 1) })));
+        }
       }
     }
     // --- STORM LOGIC ---
