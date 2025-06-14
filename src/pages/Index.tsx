@@ -80,14 +80,14 @@ const Index = () => {
     dest?: string;
     travelTime?: number;
   }>({ open: false });
-
-  // Ref to always have the latest value for callback
   const pendingSailRef = useRef<{
     open: boolean;
     dest?: string;
     travelTime?: number;
   }>({ open: false });
-  // Whenever state updates, keep ref in sync
+  // Track if we're closing SailModal due to destination selection or cancel
+  const didPickDestinationRef = useRef(false);
+
   function updatePendingSail(next: { open: boolean; dest?: string; travelTime?: number }) {
     setPendingSail(next);
     pendingSailRef.current = next;
@@ -101,14 +101,13 @@ const Index = () => {
     console.log("[handleDestinationSelected] called with", { dest, travelTime });
     updatePendingSail({ open: true, dest, travelTime });
     setDefendShipsModalOpen(true);
+    didPickDestinationRef.current = true; // Mark that destination was picked!
     // Log pendingSailRef after update
     console.log("[handleDestinationSelected] pendingSailRef.current after update:", pendingSailRef.current);
   }
 
   function handleConfirmDefendShips(numShips: number, shipPrice: number) {
     setDefendShips(numShips, shipPrice);
-
-    // Get the current pending sail info
     const { dest, travelTime } = pendingSailRef.current;
     console.log("[handleConfirmDefendShips] pendingSailRef.current:", pendingSailRef.current);
     // Accept both 0 and positive travelTime (don't exclude 0-hour trips!)
@@ -122,6 +121,14 @@ const Index = () => {
       setDefendShipsModalOpen(false);
       updatePendingSail({ open: false });
     }
+  }
+
+  function handleSailModalClose() {
+    // Only reset pendingSail if this is not from picking destination
+    if (!didPickDestinationRef.current) {
+      updatePendingSail({ open: false });
+    }
+    didPickDestinationRef.current = false; // Always reset flag after closing modal
   }
 
   // For pirate and all events: 
@@ -227,7 +234,7 @@ const Index = () => {
       />
       <SailModal
         open={pendingSail.open && !defendShipsModalOpen}
-        onClose={() => updatePendingSail({ open: false })}
+        onClose={handleSailModalClose}
         currentCountry={country}
         currentHour={currentHour}
         onDestinationSelected={handleDestinationSelected}
