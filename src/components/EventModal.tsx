@@ -11,6 +11,7 @@ interface EventModalProps {
   options?: { label: string; value: string }[];
   onClose: () => void;
   onSelectOption?: (val: string) => string | void;
+  showOkButton?: boolean;
 }
 
 // Icon fallback map
@@ -31,6 +32,7 @@ const EventModal: React.FC<EventModalProps> = ({
   options,
   onClose,
   onSelectOption,
+  showOkButton,
 }) => {
   const [outcome, setOutcome] = useState<string | null>(null);
 
@@ -108,7 +110,13 @@ const EventModal: React.FC<EventModalProps> = ({
         ) : (
           <>
             <div className="my-2 text-base text-center w-full">{description}</div>
-            {options && options.length > 0 && (
+            {showOkButton ? (
+              <div className="flex flex-col gap-2 mt-4 w-full items-center">
+                <Button className="w-40" onClick={handleOk}>
+                  OK
+                </Button>
+              </div>
+            ) : options && options.length > 0 ? (
               <div className="flex flex-col gap-2 mt-4 w-full items-center">
                 {options.map((opt) => (
                   <Button
@@ -121,7 +129,7 @@ const EventModal: React.FC<EventModalProps> = ({
                   </Button>
                 ))}
               </div>
-            )}
+            ) : null}
           </>
         )}
       </DialogContent>
@@ -130,4 +138,3 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
-

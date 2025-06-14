@@ -125,10 +125,11 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
     currentHour,
     setCountry,
     setWeather,
-    advanceTime, // <-- now will be in scope and valid
+    advanceTime,
     setSailOpen,
-    afterFinish: clearDefendShips, // callback after sailing ends
+    afterFinish: clearDefendShips,
     onSailSuccess: options?.onSailSuccess,
+    cargo,
   });
 
   // Actions
@@ -207,6 +208,12 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
 
   // Called when event occurs during sailing
   function triggerEvent(risk: string) {
+    if (risk === "Storm") {
+      // Handle storm automatically without user options
+      handleStormEvent();
+      return;
+    }
+    
     let desc = "";
     let options = [];
     if (risk === "Pirate") {
@@ -217,21 +224,49 @@ export function useGameLogic(options?: { onSailSuccess?: (dest: string, hadEvent
         { label: "Fight Back", value: "fight" },
       ];
     }
-    if (risk === "Storm") {
-      desc = "A violent storm hits your ship! Do you throw cargo overboard to stabilize, or try to brave the storm?";
-      options = [
-        { label: "Throw Cargo Overboard", value: "throw" },
-        { label: "Brave the Storm", value: "brave" },
-      ];
-    }
-    // Add more types if needed
+    
     setEventData({
       type: risk,
       description: desc,
       options,
     });
     setEventOpen(true);
-    sailingLogic.pauseSailing(); // <- pause ship animation when event starts
+    sailingLogic.pauseSailing();
+  }
+
+  function handleStormEvent() {
+    const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+    if (totalCargo === 0) return; // Should not happen since storm chance is 0 with no cargo
+
+    // Calculate cargo loss (10-30% of total cargo)
+    const lossPercentage = 0.1 + Math.random() * 0.2; // 10-30%
+    let cargoLost: Array<{ type: string; amount: number }> = [];
+    
+    setCargo((prev) => {
+      return prev.map((good) => {
+        if (good.amount > 0) {
+          const lostAmount = Math.floor(good.amount * lossPercentage);
+          if (lostAmount > 0) {
+            cargoLost.push({ type: good.type, amount: lostAmount });
+            return { ...good, amount: good.amount - lostAmount };
+          }
+        }
+        return good;
+      });
+    });
+
+    // Create description of what was lost
+    const lostItems = cargoLost.map(item => `${item.amount} tons of ${item.type}`).join(", ");
+    const description = `A violent storm hits your ship! Cargo is thrown overboard to keep the ship stable. You lose: ${lostItems}.`;
+    
+    // Show storm result without options
+    setEventData({
+      type: "Storm",
+      description,
+      options: [], // No options for storm
+    });
+    setEventOpen(true);
+    sailingLogic.pauseSailing();
   }
 
   // Return only the outcome string; do not toast here!

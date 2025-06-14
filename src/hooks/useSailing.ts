@@ -1,5 +1,4 @@
 
-
 import { useState } from "react";
 import { getRandomWeather } from "@/utils/gameHelpers";
 import { toast } from "@/hooks/use-toast";
@@ -13,6 +12,7 @@ export function useSailing({
   setSailOpen,
   afterFinish,
   onSailSuccess,
+  cargo,
 }: {
   country: string;
   currentHour: number;
@@ -22,6 +22,7 @@ export function useSailing({
   setSailOpen: (open: boolean) => void;
   afterFinish?: () => void;
   onSailSuccess?: (dest: string, hadEvent: boolean) => void;
+  cargo: Array<{ type: string; amount: number }>;
 }) {
   const [sailing, setSailingState] = useState<null | {
     from: string;
@@ -41,7 +42,11 @@ export function useSailing({
     
     // Calculate risk probabilities
     const pirateChance = currentHour >= 18 ? 0.4 : 0.3; // 40% at night, 30% during day
-    const stormChance = 0.25; // 25% chance of storm
+    
+    // Storm chance is 0 if no cargo, otherwise 25%
+    const totalCargo = cargo.reduce((sum, item) => sum + item.amount, 0);
+    const stormChance = totalCargo > 0 ? 0.25 : 0;
+    
     const totalEventChance = pirateChance + stormChance;
     
     let risk = null;

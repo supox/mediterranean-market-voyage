@@ -19,6 +19,9 @@ const GameEventHandler: React.FC<GameEventHandlerProps> = ({
   onEventSelect,
   onEventClose,
 }) => {
+  // For storms with no options, just show OK button
+  const isStormWithoutOptions = eventData.type === "Storm" && (!eventData.options || eventData.options.length === 0);
+
   return (
     <EventModal
       open={eventOpen}
@@ -26,7 +29,8 @@ const GameEventHandler: React.FC<GameEventHandlerProps> = ({
       description={eventData.description}
       options={eventData.options}
       onClose={onEventClose}
-      onSelectOption={onEventSelect}
+      onSelectOption={isStormWithoutOptions ? undefined : onEventSelect}
+      showOkButton={isStormWithoutOptions}
     />
   );
 };
