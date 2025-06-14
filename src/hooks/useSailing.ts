@@ -52,7 +52,7 @@ export function useSailing({
     const pirateChance = currentHour >= 18 ? 0.3 : 0.2;
     const stormChance = totalCargo > 0 ? 0.2 : 0;
     const desertedShipsChance = 0.15;
-    const navigationErrorChance = 1; // TESTING: make Navigation Error chance 100%
+    const navigationErrorChance = 0.05; // REVERT: set Navigation Error chance back to 5%
 
     const totalEventChance = pirateChance + stormChance + desertedShipsChance + navigationErrorChance;
 
