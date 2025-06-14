@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { getRandomWeather } from "@/utils/gameHelpers";
 import { toast } from "@/hooks/use-toast";
@@ -55,9 +56,9 @@ export function useSailing({
     setSailingPausedState(false);
   }
   function finishSail(dest: string, travelDays: number) {
-    // Call onSailSuccess and pass hasEventOccurred to allow filtering toasts
+    // Call onSailSuccess and pass the actual hasEventOccurred status
     if (onSailSuccess && sailing) {
-      onSailSuccess(dest, !!sailing.hasEventOccurred);
+      onSailSuccess(dest, sailing.hasEventOccurred || false);
     }
     setCountry(dest);
     setWeather(getRandomWeather());
