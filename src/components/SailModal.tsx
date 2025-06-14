@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Map } from "lucide-react";
 import { useState } from "react";
@@ -30,37 +31,58 @@ interface SailModalProps {
   onClose: () => void;
   onSail: (country: string, time: number) => void;
   currentCountry: string;
+  // To know currentHour, we get it as prop
+  currentHour?: number;
 }
+
+const DEFAULT_START_HOUR = 8;
+const DEFAULT_END_HOUR = 20;
 
 const SailModal: React.FC<SailModalProps> = ({
   open,
   onClose,
   onSail,
   currentCountry,
+  currentHour = DEFAULT_START_HOUR, // fallback if not provided
 }) => {
   const [dest, setDest] = useState<string | null>(null);
 
-  // Countries you can travel to (not current, not 999)
-  const destinations = DESTS.filter(
-    (d) => d.name !== currentCountry && ROUTES[currentCountry][d.name] !== 999
-  );
-  // Countries you can't reach
+  // Countries you can travel to: arrival by 20:00 only
+  const destinations = DESTS.filter((d) => {
+    if (d.name === currentCountry) return false;
+    const route = ROUTES[currentCountry][d.name];
+    if (route === 999) return false;
+    const travelHours = Math.round(route * 12);
+    if (currentHour + travelHours > DEFAULT_END_HOUR) return false;
+    return true;
+  });
+
+  // Countries not reachable or not allowed
   const disabled = DESTS
-    .filter(
-      (d) =>
+    .filter((d) => {
+      if (
         d.name === currentCountry ||
         ROUTES[currentCountry][d.name] === 999
-    )
+      )
+        return true;
+      const travelHours = Math.round(ROUTES[currentCountry][d.name] * 12);
+      if (currentHour + travelHours > DEFAULT_END_HOUR) return true;
+      return false;
+    })
     .map((d) => d.name);
 
   const handleSail = () => {
     if (dest && ROUTES[currentCountry][dest] !== 999) {
       const travelTime = ROUTES[currentCountry][dest];
+      const travelHours = Math.round(travelTime * 12);
+      if (currentHour + travelHours > DEFAULT_END_HOUR) return;
       onSail(dest, travelTime);
       setDest(null);
       onClose();
     }
   };
+
+  const atNight = currentHour >= DEFAULT_END_HOUR;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -72,7 +94,9 @@ const SailModal: React.FC<SailModalProps> = ({
             </span>
           </DialogTitle>
           <DialogDescription>
-            Click a reachable port on the map. Unavailable destinations are greyed out.
+            {atNight
+              ? "It's too late to set sail. Rest until next day to continue traveling."
+              : "Click a reachable port on the map. Unavailable destinations are greyed out."}
           </DialogDescription>
         </DialogHeader>
         <div>
@@ -93,16 +117,25 @@ const SailModal: React.FC<SailModalProps> = ({
             </span>
           </div>
         )}
-        <button
-          className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg mt-2 hover:bg-blue-700 disabled:opacity-70"
-          disabled={!dest || ROUTES[currentCountry][dest!] === 999}
-          onClick={handleSail}
-        >
-          {dest ? `Sail to ${dest}` : "Select Destination on Map"}
-        </button>
+        {destinations.length === 0 || atNight ? (
+          <div className="w-full py-2 text-center text-blue-700/90 mt-2 bg-blue-50 border border-blue-200 rounded-lg font-medium text-sm">
+            {atNight
+              ? "You must rest until the next day to sail."
+              : "No destinations can be reached before nightfall. Try again next day."}
+          </div>
+        ) : (
+          <button
+            className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg mt-2 hover:bg-blue-700 disabled:opacity-70"
+            disabled={!dest || disabled.includes(dest)}
+            onClick={handleSail}
+          >
+            {dest ? `Sail to ${dest}` : "Select Destination on Map"}
+          </button>
+        )}
       </DialogContent>
     </Dialog>
   );
 };
 
 export default SailModal;
+

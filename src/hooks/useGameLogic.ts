@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { generatePrices } from "@/utils/pricing";
@@ -51,6 +50,7 @@ export function useGameLogic() {
   const cargoGood = (type: string) =>
     cargo.find((g) => g.type === type) || { type, amount: 0 };
 
+  // Only advances the day if "rest" is called
   function advanceTime(hours: number | "rest") {
     if (hours === "rest") {
       setDay((d) => d + 1);
@@ -60,19 +60,13 @@ export function useGameLogic() {
       return;
     }
     let newHour = currentHour + hours;
-    let dayIncreased = false;
-    if (newHour >= DAY_END_HOUR) {
-      // Go to next day if gone past 20:00, start at 08:00
-      setDay((d) => d + 1);
-      setCurrentHour(DAY_START_HOUR + (newHour - DAY_END_HOUR));
-      setWeather(getRandomWeather());
-      dayIncreased = true;
+    if (newHour > DAY_END_HOUR) {
+      // Cap hour to 20:00 if trying to exceed it—no day increment
+      setCurrentHour(DAY_END_HOUR);
     } else {
       setCurrentHour(newHour);
     }
-    if (dayIncreased) {
-      toast({ description: "A new day dawns over the Mediterranean." });
-    }
+    // Day only increases on rest now
   }
 
   // Actions
@@ -119,7 +113,12 @@ export function useGameLogic() {
 
   // Sailing always advances time by travel time in hours, allows multi-leg (e.g. 0.5d = 6hrs)
   function handleSail(dest: string, travelDays: number) {
-    const travelHours = Math.round(travelDays * 12); // 1 d = 12 hours (08:00 -> 20:00), e.g. 0.5 d = 6h
+    const travelHours = Math.round(travelDays * 12);
+    // Only sail if arrival is before or at 20:00
+    if (currentHour + travelHours > DAY_END_HOUR) {
+      toast({ title: "Cannot Sail", description: "You can't arrive after 20:00. Please rest until the next day." });
+      return;
+    }
     const risk =
       Math.random() < (currentHour >= 18 ? 0.18 : 0.1)
         ? "Pirate"

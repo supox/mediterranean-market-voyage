@@ -1,4 +1,3 @@
-
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -16,6 +15,7 @@ const Index = () => {
     // Game state
     day,
     formattedTime, // changed from timeOfDay
+    currentHour, // <--- bring this from useGameLogic to pass down!
     country,
     weather,
     balance,
@@ -100,6 +100,7 @@ const Index = () => {
         onClose={() => setSailOpen(false)}
         onSail={handleSail}
         currentCountry={country}
+        currentHour={currentHour}
       />
       <EventModal
         open={eventOpen}
