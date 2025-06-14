@@ -11,6 +11,7 @@ import { useGameLogic } from "@/hooks/useGameLogic";
 import React, { useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 import CargoExpansionModal from "@/components/CargoExpansionModal";
+import MapCurrentShip from "@/components/MapCurrentShip";
 
 const Index = () => {
   const [mapShouldFadeOut, setMapShouldFadeOut] = useState(false);
@@ -174,6 +175,10 @@ const Index = () => {
           </>
         )}
       </div>
+      {/* Show static map with ship location above prices table */}
+      {!sailing && (
+        <MapCurrentShip country={country} />
+      )}
       {!sailing && (
         <PricesTable pricesByCountry={pricesByCountry} country={country} />
       )}
