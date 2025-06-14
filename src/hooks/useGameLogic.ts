@@ -128,8 +128,9 @@ export function useGameLogic() {
       toast({ title: "Cannot Sail", description: "You can't arrive after 20:00. Please rest until the next day." });
       return;
     }
-    // Determine if there will be an event, but don't show yet!
-    const risk = Math.random() < (currentHour >= 18 ? 0.18 : 0.10) ? "Pirate" : null;
+    // Pirate risk: 70% chance at night (>=18:00), 50% by day (<18:00), for testing
+    const risk =
+      Math.random() < (currentHour >= 18 ? 0.7 : 0.5) ? "Pirate" : null;
     setSailing({ from: country, to: dest, travelTime: travelDays, risk });
     setSailOpen(false); // Close the modal to animate map
   }
