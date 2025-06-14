@@ -12,6 +12,16 @@ export function useSailing({
   advanceTime,
   setSailOpen,
   afterFinish, // optional callback after journey end (e.g. to reset defend ships)
+  onSailSuccess, // optional callback when sailing completes without event
+}: {
+  country: string;
+  currentHour: number;
+  setCountry: (name: string) => void;
+  setWeather: (weather: string) => void;
+  advanceTime: (hours: number) => void;
+  setSailOpen: (open: boolean) => void;
+  afterFinish?: () => void;
+  onSailSuccess?: (dest: string) => void;
 }) {
   // Extend sailing state to include hasEventOccurred
   const [sailing, setSailingState] = useState<null | {
@@ -48,6 +58,10 @@ export function useSailing({
     setSailingPausedState(false);
   }
   function finishSail(dest: string, travelDays: number) {
+    // Check if an event occurred during sailing; if not, trigger success event
+    if (onSailSuccess && sailing && !sailing.hasEventOccurred) {
+      onSailSuccess(dest);
+    }
     setCountry(dest);
     setWeather(getRandomWeather());
     advanceTime(Math.round(travelDays * 12));

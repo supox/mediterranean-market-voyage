@@ -10,9 +10,18 @@ import MapMed from "@/components/MapMed";
 import DefendShipsModal from "@/components/DefendShipsModal";
 import { useGameLogic } from "@/hooks/useGameLogic";
 import React, { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 // Main game page, using extracted logic and focused components
 const Index = () => {
+  // SAIL SUCCESS TOAST HANDLER
+  function handleSailSuccess(destination: string) {
+    toast({
+      title: "Smooth Sailing!",
+      description: `You sailed to ${destination} with no incidents.`,
+    });
+  }
+
   const {
     // Game state
     day,
@@ -26,7 +35,6 @@ const Index = () => {
     cargoForHeader,
     prices,
     pricesByCountry,
-
     // Modal states
     marketOpen,
     setMarketOpen,
@@ -38,7 +46,6 @@ const Index = () => {
     setEventOpen,
     eventData,
     setEventData,
-
     // Actions
     handleMarketTrade,
     handleBankAction,
@@ -51,7 +58,6 @@ const Index = () => {
     sailing,
     sailingPaused,
     resumeSailing,
-
     // Game flags
     isGameOver,
     maxDeposit,
@@ -61,7 +67,7 @@ const Index = () => {
     setDefendShipsModalOpen,
     cargoValue,
     setSailingHasEventOccurred,
-  } = useGameLogic();
+  } = useGameLogic({ onSailSuccess: handleSailSuccess });
 
   // Intercept sailing: 1. ask about defend ships, then 2. continue to normal sail modal
   const [pendingSail, setPendingSail] = useState<{open: boolean}>({ open: false });

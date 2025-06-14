@@ -33,7 +33,7 @@ import { useSailing } from "./useSailing";
 //   return hour.toString().padStart(2, "0") + ":00";
 // }
 
-export function useGameLogic() {
+export function useGameLogic(options?: { onSailSuccess?: (dest: string) => void }) {
   const [day, setDay] = useState(1);
   // Instead of "Morning", "Midday", etc., use hour (integer, 8 - 20 inclusive)
   const [currentHour, setCurrentHour] = useState(DAY_START_HOUR);
@@ -128,6 +128,7 @@ export function useGameLogic() {
     advanceTime, // <-- now will be in scope and valid
     setSailOpen,
     afterFinish: clearDefendShips, // callback after sailing ends
+    onSailSuccess: options?.onSailSuccess,
   });
 
   // Actions
