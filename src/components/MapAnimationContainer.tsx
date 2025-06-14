@@ -2,6 +2,13 @@
 import React from "react";
 import MapMed from "./MapMed";
 
+// Hebrew country labels for translation in title
+const COUNTRY_LABELS: Record<string, string> = {
+  Turkey: "טורקיה",
+  Israel: "ישראל",
+  Egypt: "מצרים",
+};
+
 interface MapAnimationContainerProps {
   sailing: {
     from: string;
@@ -28,11 +35,17 @@ const MapAnimationContainer: React.FC<MapAnimationContainerProps> = ({
         mapShouldFadeOut ? "animate-fade-out" : ""
       }`}
     >
-      <h3 className="font-bold text-blue-800 text-lg flex items-center gap-2 mb-2">
+      <h3 className="font-bold text-blue-800 text-lg flex items-center gap-2 mb-2 text-right justify-end">
         <span>
-          🧭 Sailing from{" "}
-          <span className="font-semibold">{sailing.from}</span> to{" "}
-          <span className="font-semibold">{sailing.to}</span>...
+          🧭 הספינה מפליגה מ
+          <span className="font-semibold mx-1">
+            {COUNTRY_LABELS[sailing.from] ?? sailing.from}
+          </span>
+          אל
+          <span className="font-semibold mx-1">
+            {COUNTRY_LABELS[sailing.to] ?? sailing.to}
+          </span>
+          ...
         </span>
       </h3>
       <MapMed
@@ -47,10 +60,11 @@ const MapAnimationContainer: React.FC<MapAnimationContainerProps> = ({
         }}
       />
       <div className="text-blue-700 mt-2 text-center text-sm font-medium">
-        The ship is at sea. Please wait...
+        הספינה בים. אנא המתן...
       </div>
     </div>
   );
 };
 
 export default MapAnimationContainer;
+

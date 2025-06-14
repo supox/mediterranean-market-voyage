@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -75,7 +76,7 @@ const DefendShipsModal: React.FC<DefendShipsModalProps> = ({
             onClick={() => onConfirm(selected, pricePerShip)}
             disabled={selected * pricePerShip > balance}
           >
-            שכור {selected > 0 ? selected : "אין"} ספינות
+            {selected > 0 ? `שכור ${selected} ספינות` : "אל תשכור ספינות"}
           </Button>
         </div>
       </DialogContent>

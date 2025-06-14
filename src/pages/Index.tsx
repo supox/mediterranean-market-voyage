@@ -1,3 +1,4 @@
+
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -24,8 +25,8 @@ const Index = () => {
     if (!hadEvent && !hasShownSmoothSailingToast.current) {
       hasShownSmoothSailingToast.current = true;
       toast({
-        title: "Smooth Sailing!",
-        description: `You sailed to ${destination} with no incidents.`,
+        title: "הפלגה חלקה!",
+        description: `הפלגת בהצלחה ל${destination} ללא תקלות.`,
       });
       setTimeout(() => {
         setMapShouldFadeOut(true);
