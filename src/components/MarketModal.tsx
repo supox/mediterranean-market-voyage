@@ -1,9 +1,7 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
-import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
+import { useState } from "react";
 
 // Helper to get a random price between min and max (inclusive), rounded to nearest 5
 function randomPrice(min: number, max: number) {
@@ -47,55 +45,12 @@ const MarketModal: React.FC<MarketModalProps> = ({
   const [type, setType] = useState("Wheat");
   const [quantity, setQuantity] = useState(0);
   const [isBuy, setIsBuy] = useState(true);
-  const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const price = prices[type as keyof typeof prices];
   const cargoAmount = cargo.find((g) => g.type === type)?.amount || 0;
   const maxAffordable = isBuy
     ? Math.floor(balance / price)
     : cargoAmount;
-
-  const marketImage = countryImages[country];
-
-  useEffect(() => {
-    if (open && marketImage && !processedImageUrl) {
-      processBackgroundRemoval();
-    }
-  }, [open, marketImage, processedImageUrl]);
-
-  const processBackgroundRemoval = async () => {
-    if (!marketImage || isProcessing) return;
-    
-    setIsProcessing(true);
-    try {
-      // Load the image
-      const response = await fetch(marketImage);
-      const blob = await response.blob();
-      const imageElement = await loadImage(blob);
-      
-      // Remove background
-      const processedBlob = await removeBackground(imageElement);
-      const url = URL.createObjectURL(processedBlob);
-      setProcessedImageUrl(url);
-      
-      console.log('Background removal completed successfully');
-    } catch (error) {
-      console.error('Background removal failed:', error);
-      // Keep the original image if processing fails
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // Clean up URL when component unmounts or image changes
-  useEffect(() => {
-    return () => {
-      if (processedImageUrl) {
-        URL.revokeObjectURL(processedImageUrl);
-      }
-    };
-  }, [processedImageUrl]);
 
   function handleTrade() {
     if (quantity > 0 && quantity <= maxAffordable) {
@@ -115,6 +70,8 @@ const MarketModal: React.FC<MarketModalProps> = ({
     setQuantity(maxAffordable);
   }
 
+  const marketImage = countryImages[country];
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm sm:max-w-md">
@@ -122,10 +79,10 @@ const MarketModal: React.FC<MarketModalProps> = ({
           <DialogTitle className="w-full text-center">{isBuy ? "קנה סחורה" : "מכור סחורה"}</DialogTitle>
         </DialogHeader>
         {/* Larger, less-padded Image for Market popup */}
-        <div className="flex justify-center items-center mb-1">
-          {(processedImageUrl || marketImage) ? (
+        <div className="flex justify-center items-center mb-1" style={{ background: "#f2e6c9", borderRadius: 12, minHeight: 0 }}>
+          {marketImage ? (
             <img
-              src={processedImageUrl || marketImage}
+              src={marketImage}
               alt={`שוק ב${country === "Israel" ? "ישראל" : country === "Turkey" ? "טורקיה" : country === "Egypt" ? "מצרים" : country}`}
               className="w-60 h-44 object-cover rounded-md shadow border"
               style={{ margin: 0, padding: 0 }}
@@ -137,11 +94,6 @@ const MarketModal: React.FC<MarketModalProps> = ({
               className="w-60 h-44 object-cover rounded-md shadow border"
               style={{ margin: 0, padding: 0 }}
             />
-          )}
-          {isProcessing && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 rounded-md">
-              <div className="text-white text-sm">מעבד תמונה...</div>
-            </div>
           )}
         </div>
         <div className="flex gap-3 items-center mt-1 mb-2">
