@@ -1,4 +1,5 @@
 
+
 import {
   Table,
   TableHeader,
@@ -65,3 +66,4 @@ export default function PricesTable({ pricesByCountry, country }: PricesTablePro
     </div>
   );
 }
+

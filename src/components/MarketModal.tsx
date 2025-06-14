@@ -93,7 +93,7 @@ const MarketModal: React.FC<MarketModalProps> = ({ open, onClose, onTrade, balan
         </div>
         <div className="flex items-center gap-5 mb-2">
           <Label>Price:</Label>
-          <span className="font-semibold">{price.toLocaleString()} NIS / ton</span>
+          <span className="font-semibold">{price.toLocaleString()} ₪ / ton</span>
         </div>
         <div className="flex gap-3 mb-3">
           <button
