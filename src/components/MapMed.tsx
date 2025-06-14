@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { Ship } from "lucide-react";
 
@@ -35,7 +34,9 @@ interface MapMedProps {
   onSelectCountry?: (country: string) => void; // for clicking countries
   highlightCurrent?: boolean; // highlight the ship/country
   // Animation
-  animateShip?: AnimateShipProps;
+  animateShip?: AnimateShipProps & {
+    paused?: boolean; // add paused option
+  };
 }
 
 function getCurve(from: {x:number, y:number}, to: {x:number, y:number}) {
@@ -72,8 +73,15 @@ const MapMed: React.FC<MapMedProps> = ({
     setAnimProgress(0);
     setMidFired(false);
     let start = performance.now();
+    let lastElapsed = 0;
+
     function draw(now: number) {
-      const elapsed = now - start;
+      if (animateShip.paused) {
+        // If paused, don't update anim
+        shipAnimRef.current = requestAnimationFrame(draw);
+        return;
+      }
+      const elapsed = now - start + lastElapsed;
       let p = Math.min(1, elapsed / animateShip.duration);
       setAnimProgress(p);
       // Fire midpoint event if needed
@@ -88,13 +96,28 @@ const MapMed: React.FC<MapMedProps> = ({
         shipAnimRef.current = null;
       }
     }
-    shipAnimRef.current = requestAnimationFrame(draw);
+
+    function frame(now: number) {
+      if (!animateShip.paused) {
+        draw(now);
+      } else {
+        shipAnimRef.current = requestAnimationFrame(frame);
+      }
+    }
+
+    // When paused, loop without progressing.
+    if (animateShip.paused) {
+      shipAnimRef.current = requestAnimationFrame(frame);
+    } else {
+      shipAnimRef.current = requestAnimationFrame(draw);
+    }
+
     return () => {
       if (shipAnimRef.current) cancelAnimationFrame(shipAnimRef.current);
       shipAnimRef.current = null;
     };
     // eslint-disable-next-line
-  }, [animateShip?.from, animateShip?.to, animateShip?.duration, animateShip?.risk]);
+  }, [animateShip?.from, animateShip?.to, animateShip?.duration, animateShip?.risk, animateShip?.paused]);
 
   // Find anim position
   let shipAnimPos: {x:number,y:number}|null = null;

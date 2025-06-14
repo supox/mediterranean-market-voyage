@@ -46,13 +46,25 @@ const Index = () => {
     resetGame,
     finishSail, // called when animation ends or after event
     triggerEvent, // called at midpoint if risk exists
-    sailing, // { from, to, travelTime, risk }
+    sailing,
+    sailingPaused,
+    resumeSailing,
 
     // Game flags
     isGameOver,
     maxDeposit,
     maxWithdraw,
   } = useGameLogic();
+
+  // Provide a function to handle event option and to close modal (resume sailing)
+  function onEventSelect(val: string) {
+    handleEventOption(val);
+    resumeSailing();
+  }
+
+  function onEventClose() {
+    resumeSailing();
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-200 via-white to-yellow-50 w-full">
@@ -89,14 +101,13 @@ const Index = () => {
                   <span>🧭 Sailing from <span className="font-semibold">{sailing.from}</span> to <span className="font-semibold">{sailing.to}</span>...</span>
                 </h3>
                 <MapMed
-                  // Ship animates from `sailing.from` to `sailing.to`
                   animateShip={{
                     from: sailing.from,
                     to: sailing.to,
-                    duration: 10_000, // ms
+                    duration: 10_000,
                     risk: sailing.risk,
+                    paused: sailingPaused,
                     onMidpoint: () => {
-                      // If event to trigger, do it now
                       if (sailing.risk) {
                         triggerEvent(sailing.risk);
                       }
@@ -105,7 +116,6 @@ const Index = () => {
                       finishSail(sailing.to, sailing.travelTime);
                     }
                   }}
-                  // Highlight only traveling, not market
                 />
                 <div className="text-blue-700 mt-2 text-center text-sm font-medium">The ship is at sea. Please wait...</div>
               </div>
@@ -144,8 +154,8 @@ const Index = () => {
         type={eventData.type}
         description={eventData.description}
         options={eventData.options}
-        onClose={() => setEventOpen(false)}
-        onSelectOption={handleEventOption}
+        onClose={onEventClose}
+        onSelectOption={onEventSelect}
       />
     </div>
   );

@@ -57,6 +57,7 @@ export function useGameLogic() {
     travelTime: number;
     risk: string | null; // event type, e.g. "Pirate", "Storm", etc.
   }>(null);
+  const [sailingPaused, setSailingPaused] = useState(false);
 
   // Only advances the day if "rest" is called
   function advanceTime(hours: number | "rest") {
@@ -132,7 +133,15 @@ export function useGameLogic() {
     const risk =
       Math.random() < (currentHour >= 18 ? 0.7 : 0.5) ? "Pirate" : null;
     setSailing({ from: country, to: dest, travelTime: travelDays, risk });
+    setSailingPaused(false); // ensure not paused at start
     setSailOpen(false); // Close the modal to animate map
+  }
+
+  function pauseSailing() {
+    setSailingPaused(true);
+  }
+  function resumeSailing() {
+    setSailingPaused(false);
   }
 
   // Called when animation finishes (or after event resolved)
@@ -141,6 +150,7 @@ export function useGameLogic() {
     setWeather(getRandomWeather());
     advanceTime(Math.round(travelDays * 12));
     setSailing(null);
+    setSailingPaused(false);
   }
 
   // Called when event occurs during sailing
@@ -162,6 +172,7 @@ export function useGameLogic() {
       options,
     });
     setEventOpen(true);
+    setSailingPaused(true); // <- pause ship animation when event starts
   }
 
   function handleEventOption(val: string) {
@@ -178,7 +189,8 @@ export function useGameLogic() {
 
     // If currently sailing, finish sail after event
     if (sailing) {
-      finishSail(sailing.to, sailing.travelTime);
+      // Do not finish the sail here! Just resume animation; finishSail is triggered when animation ends.
+      setSailingPaused(false); // resume sailing after event
     }
   }
 
@@ -264,6 +276,9 @@ export function useGameLogic() {
     pricesByCountry, // all countries
     dayStartHour: DAY_START_HOUR,
     dayEndHour: DAY_END_HOUR,
+    sailingPaused, // <--------- NEW
+    pauseSailing,
+    resumeSailing,
   };
 }
 
