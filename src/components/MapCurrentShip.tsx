@@ -1,4 +1,3 @@
-
 import React from "react";
 import { LOCATIONS, FLAG } from "@/utils/mapConfig";
 import MapShip from "./MapShip";
@@ -95,7 +94,6 @@ const MapCurrentShip: React.FC<MapCurrentShipProps> = ({ country }) => {
             <MapShip from={country} to={country} animProgress={0} />
           )}
         </svg>
-        <div className="absolute left-3 top-2 px-3 py-1 rounded bg-white/70 text-blue-900 font-semibold text-sm shadow">Your Ship's Location</div>
       </div>
     </div>
   );

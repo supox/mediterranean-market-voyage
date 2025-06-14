@@ -19,7 +19,7 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
   country,
 }) => {
   return (
-    <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
+    <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
       <button
         onClick={onMarket}
         className="flex flex-col items-center p-5 bg-gradient-to-b from-yellow-50 to-white border border-yellow-100 rounded-xl shadow hover:scale-[1.03] focus:ring-2 focus:ring-blue-200 transition-all duration-150"
