@@ -196,6 +196,7 @@ export function useGameLogic() {
     sailingLogic.pauseSailing(); // <- pause ship animation when event starts
   }
 
+  // Return only the outcome string; do not toast here!
   function handleEventOption(val: string) {
     let desc = "";
     if (val === "escape") desc = "You attempt to flee... and narrowly evade capture!";
@@ -206,13 +207,10 @@ export function useGameLogic() {
       setBalance((b) => b + plunder);
       desc = `Battle ensues! You win, and plunder ${plunder} coins from the pirates.`;
     }
-    toast({ title: "Event Outcome", description: desc });
+    // Do NOT show toast here!
 
-    // If currently sailing, finish sail after event
-    if (sailingLogic.sailing) {
-      // Do not finish the sail here! Just resume animation; finishSail is triggered when animation ends.
-      sailingLogic.resumeSailing(); // resume sailing after event
-    }
+    // Only return the desc for EventModal
+    return desc;
   }
 
   function handleRest() {

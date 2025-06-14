@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Ship, Flag, MessageSquare, Coins } from "lucide-react";
@@ -39,7 +38,6 @@ const EventModal: React.FC<EventModalProps> = ({
   }, [open]);
 
   function handleOption(val: string) {
-    // If onSelectOption returns a string, treat as outcome
     let result: string | void = undefined;
     if (onSelectOption) {
       result = onSelectOption(val);
@@ -47,14 +45,15 @@ const EventModal: React.FC<EventModalProps> = ({
     if (typeof result === "string" && result.length > 0) {
       setOutcome(result);
     } else {
-      // Fallback to generic message if no feedback
-      setOutcome("Action complete.");
+      // If no feedback, just close (should not happen)
+      onClose();
     }
   }
 
   function handleOk() {
     setOutcome(null);
     onClose();
+    // journey will continue from parent onClose logic!
   }
 
   return (
@@ -65,7 +64,6 @@ const EventModal: React.FC<EventModalProps> = ({
             {ICONS[type] || <Flag size={28} />} {type ? type + " Event" : "Event"}
           </DialogTitle>
         </DialogHeader>
-        {/* Show the pirate image if this is a pirate event */}
         {type === "Pirate" && (
           <img
             src={PIRATE_IMAGE_SRC}
@@ -85,7 +83,6 @@ const EventModal: React.FC<EventModalProps> = ({
           </div>
         ) : (
           <>
-            {/* Modal query text */}
             <div className="my-2 text-base text-center w-full">{description}</div>
             {options && (
               <div className="flex flex-col gap-2 mt-4 w-full items-center">
@@ -109,4 +106,3 @@ const EventModal: React.FC<EventModalProps> = ({
 };
 
 export default EventModal;
-
