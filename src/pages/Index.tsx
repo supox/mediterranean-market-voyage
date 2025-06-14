@@ -1,3 +1,4 @@
+
 import GameHeader from "@/components/GameHeader";
 import ActionPanel from "@/components/ActionPanel";
 import MarketModal from "@/components/MarketModal";
@@ -175,7 +176,7 @@ const Index = () => {
           <img 
             src="/lovable-uploads/3005d0e3-e3f7-45b6-915e-4c2c881f96f2.png" 
             alt="Mediterranean ship" 
-            className="w-8 h-8 md:w-10 md:h-10 object-contain"
+            className="w-10 h-10 md:w-14 md:h-14 object-contain"
           />
           סוחר הים התיכון
         </h1>
