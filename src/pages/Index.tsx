@@ -98,23 +98,27 @@ const Index = () => {
   }
 
   function handleDestinationSelected(dest: string, travelTime: number) {
+    console.log("[handleDestinationSelected] called with", { dest, travelTime });
     updatePendingSail({ open: true, dest, travelTime });
     setDefendShipsModalOpen(true);
+    // Log pendingSailRef after update
+    console.log("[handleDestinationSelected] pendingSailRef.current after update:", pendingSailRef.current);
   }
 
   function handleConfirmDefendShips(numShips: number, shipPrice: number) {
-    // Set defend ships (Charges the user)
     setDefendShips(numShips, shipPrice);
 
-    // Immediately trigger the sailing, then close defend modal and pending state.
+    // Get the current pending sail info
     const { dest, travelTime } = pendingSailRef.current;
-    if (dest && travelTime !== undefined) {
+    console.log("[handleConfirmDefendShips] pendingSailRef.current:", pendingSailRef.current);
+    // Accept both 0 and positive travelTime (don't exclude 0-hour trips!)
+    if (dest && travelTime !== undefined && travelTime !== null) {
+      console.log("[handleConfirmDefendShips] Triggering handleSail with", { dest, travelTime });
       handleSail(dest, travelTime);
       updatePendingSail({ open: false }); // Close sail modal and clear dest
       setDefendShipsModalOpen(false);
-      // No need to wait for modal closing, animation/map will show right away.
     } else {
-      // Defensive: just close modal, but this shouldn't happen if flow is right
+      console.warn("[handleConfirmDefendShips] Cannot start sailing. Closing modals defensively. Values:", { dest, travelTime });
       setDefendShipsModalOpen(false);
       updatePendingSail({ open: false });
     }
