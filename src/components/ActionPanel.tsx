@@ -22,6 +22,12 @@ const ActionPanel: React.FC<ActionPanelProps> = ({
       className="flex flex-col items-center p-5 bg-gradient-to-b from-yellow-50 to-white border border-yellow-100 rounded-xl shadow hover:scale-[1.03] focus:ring-2 focus:ring-blue-200 transition-all duration-150"
       disabled={disabled}
     >
+      <img
+        src="/lovable-uploads/65af5864-7834-4eda-8f8c-a0f7e4772f3d.png"
+        alt="Go to Market"
+        className="w-16 h-16 object-cover mb-2 rounded-md shadow-sm"
+        style={{ background: "#f2e6c9" }}
+      />
       <Store size={34} className="mb-2 text-yellow-700" />
       <span className="font-semibold text-lg">Go to Market</span>
     </button>
