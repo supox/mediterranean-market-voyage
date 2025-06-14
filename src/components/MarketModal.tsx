@@ -29,6 +29,7 @@ interface MarketModalProps {
 const countryImages: { [key: string]: string } = {
   Turkey: "/lovable-uploads/b04ca857-7db0-4cc0-b5f5-5a56f7541f3a.png",
   Israel: "/lovable-uploads/0012a6a2-00dd-4e07-82ed-04430c01a234.png",
+  Egypt: "/lovable-uploads/23ac5e36-2a0e-4ee3-9659-01a0cbe024f9.png", // <-- Added Egypt image
   // Add more here as you upload for other countries
 };
 
